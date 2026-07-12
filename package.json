@@ -1,0 +1,15 @@
+{
+  "name": "nanolink",
+  "version": "1.0.0",
+  "description": "NanoLink Monorepo",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspaces --if-present",
+    "build": "npm run build --workspaces --if-present",
+    "start": "npm run start --workspace=backend"
+  }
+}
