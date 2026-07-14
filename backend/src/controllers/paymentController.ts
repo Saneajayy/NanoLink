@@ -14,7 +14,7 @@ export const createOrder = async (req: Request, res: Response) => {
   try {
     const user = (req as any).user;
     const razorpay = getRazorpayInstance();
-    
+
     // Hardcoded amount for MVP: $9.99/mo roughly = 800 INR
     const options = {
       amount: 800 * 100, // amount in smallest currency unit (paise)
@@ -34,6 +34,7 @@ export const createOrder = async (req: Request, res: Response) => {
   }
 };
 
+// export function 
 export const verifyPayment = async (req: Request, res: Response) => {
   try {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
@@ -50,7 +51,7 @@ export const verifyPayment = async (req: Request, res: Response) => {
 
     if (isAuthentic) {
       // Upgrade user plan
-      await User.findByIdAndUpdate(user._id, { plan: 'paid' });
+      await User.findByIdAndUpdate(user._id, { plan: 'core' });
       res.json({ message: 'Payment verified and plan upgraded successfully' });
     } else {
       res.status(400).json({ message: 'Invalid payment signature' });
@@ -71,7 +72,7 @@ export const razorpayWebhook = async (req: Request, res: Response) => {
       .digest('hex');
 
     if (signature !== expectedSignature) {
-      res.status(400).json({ message: 'Invalid webhook signature' });
+      res.status(400).json({ message: 'Invalid webhook sign' });
       return;
     }
 
@@ -82,7 +83,7 @@ export const razorpayWebhook = async (req: Request, res: Response) => {
       // In a real app we'd link payment.notes.userId or find user by email
       // Example: 
       // const userEmail = payment.email;
-      // await User.findOneAndUpdate({ email: userEmail }, { plan: 'paid' });
+      // await User.findOneAndUpdate({ email: userEmail }, { plan: 'core' });
     }
 
     res.json({ status: 'ok' });

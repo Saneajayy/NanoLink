@@ -8,6 +8,6 @@ const router = express.Router();
 router.route('/').post(protect, createLink).get(protect, getLinks);
 router.route('/:id').get(protect, getLinkById).put(protect, updateLink).delete(protect, deleteLink);
 router.route('/:id/analytics').get(protect, getLinkAnalytics);
-router.route('/:id/qr').get(protect, generateQRCode);
+router.route('/:id/qr').post(protect, generateQRCode);
 
 export default router;

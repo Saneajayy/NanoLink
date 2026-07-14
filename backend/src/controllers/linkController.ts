@@ -7,15 +7,46 @@ const generateSlug = (length = 6) => {
   return crypto.randomBytes(length).toString('base64').replace(/[^a-zA-Z0-9]/g, '').substring(0, length);
 };
 
+const PLAN_LIMITS = {
+  free: {
+    linksPerMonth: 50,
+    customBackHalvesPerMonth: 3,
+    qrCodesPerMonth: 2,
+    analyticsRetentionDays: 7,
+  },
+  core: {
+    linksPerMonth: 100,
+    customBackHalvesPerMonth: Infinity, // unlimited within the 100 link cap
+    qrCodesPerMonth: 5,
+    analyticsRetentionDays: 30,
+  }
+};
+
 export const createLink = async (req: Request, res: Response) => {
   try {
     const { originalUrl, customAlias, title } = req.body;
     const user = (req as any).user;
+    
+    // Default to free if user plan is not core
+    const plan = user.plan === 'core' ? 'core' : 'free';
+    const limits = PLAN_LIMITS[plan];
 
-    // Check free tier limits
-    if (user.plan === 'free') {
-      if (user.monthlyLinkCount >= 25) {
-        res.status(403).json({ message: 'Monthly link limit reached. Please upgrade to a paid plan.' });
+    // Check monthly link limits
+    if (user.monthlyLinkCount >= limits.linksPerMonth) {
+      res.status(403).json({ error: 'QUOTA_EXCEEDED', limitType: 'linksPerMonth', message: 'Monthly link limit reached. Please upgrade to a higher plan.' });
+      return;
+    }
+
+    if (customAlias && plan === 'free') {
+      // Compute custom back halves created this month
+      const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+      const customAliasCount = await Link.countDocuments({
+        owner: user._id,
+        customAlias: true,
+        createdAt: { $gte: startOfMonth }
+      });
+      if (customAliasCount >= limits.customBackHalvesPerMonth) {
+        res.status(403).json({ error: 'QUOTA_EXCEEDED', limitType: 'customBackHalvesPerMonth', message: 'Monthly custom back-half limit reached. Please upgrade to a higher plan.' });
         return;
       }
     }
@@ -52,12 +83,7 @@ export const createLink = async (req: Request, res: Response) => {
       return;
     }
 
-    if (user.plan === 'free') {
-      if (customAlias) {
-        // Free tier can only use custom aliases if we allow it, spec says 5 custom aliases/month
-        // For simplicity let's assume we enforce a counter, but for MVP we might just check if custom alias is allowed
-      }
-    }
+
 
     let slug = customAlias;
     if (!slug) {
