@@ -27,6 +27,9 @@ const Navbar = () => {
           <div className="flex items-center gap-4">
             {user ? (
               <>
+                <Link to="/pricing" className="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">
+                  Pricing
+                </Link>
                 <Link to="/dashboard" className="text-sm font-medium text-slate-600 hover:text-slate-900">
                   Dashboard
                 </Link>
@@ -39,6 +42,9 @@ const Navbar = () => {
               </>
             ) : (
               <>
+                <Link to="/pricing" className="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">
+                  Pricing
+                </Link>
                 <Link to="/login" className="text-sm font-medium text-slate-600 hover:text-slate-900">
                   Log in
                 </Link>

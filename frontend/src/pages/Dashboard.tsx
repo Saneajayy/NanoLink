@@ -66,23 +66,33 @@ const Dashboard = () => {
           <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
           <p className="text-sm text-slate-500 mt-1">Manage your shortened links</p>
         </div>
-        <div className="hidden md:flex items-center gap-6 text-sm">
-          <div className="bg-white px-4 py-2 rounded-lg border border-slate-200 shadow-sm flex items-center gap-3">
-            <span className="text-slate-500 font-medium">Links:</span>
-            <span className="font-bold text-indigo-600">{user?.monthlyLinkCount || 0} / {user?.plan === 'core' ? 100 : 50}</span>
+        <div className="flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-4 text-sm mr-4">
+            <div className="bg-white px-4 py-2 rounded-lg border border-slate-200 shadow-sm flex items-center gap-3">
+              <span className="text-slate-500 font-medium">Links:</span>
+              <span className="font-bold text-indigo-600">{user?.monthlyLinkCount || 0} / {user?.plan === 'core' ? 100 : 50}</span>
+            </div>
+            <div className="bg-white px-4 py-2 rounded-lg border border-slate-200 shadow-sm flex items-center gap-3">
+              <span className="text-slate-500 font-medium">QR Codes:</span>
+              <span className="font-bold text-indigo-600">{user?.monthlyQrCodeCount || 0} / {user?.plan === 'core' ? 5 : 2}</span>
+            </div>
           </div>
-          <div className="bg-white px-4 py-2 rounded-lg border border-slate-200 shadow-sm flex items-center gap-3">
-            <span className="text-slate-500 font-medium">QR Codes:</span>
-            <span className="font-bold text-indigo-600">{user?.monthlyQrCodeCount || 0} / {user?.plan === 'core' ? 5 : 2}</span>
-          </div>
+          {user?.plan !== 'core' && (
+            <RouterLink 
+              to="/pricing"
+              className="inline-flex items-center gap-2 rounded-lg bg-indigo-50 border border-indigo-200 px-4 py-2.5 text-sm font-semibold text-indigo-700 hover:bg-indigo-100 transition-colors"
+            >
+              Upgrade
+            </RouterLink>
+          )}
+          <button 
+            onClick={() => setIsModalOpen(true)}
+            className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 transition-colors"
+          >
+            <Plus className="h-4 w-4" />
+            Create Link
+          </button>
         </div>
-        <button 
-          onClick={() => setIsModalOpen(true)}
-          className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 transition-colors"
-        >
-          <Plus className="h-4 w-4" />
-          Create Link
-        </button>
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">

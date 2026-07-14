@@ -13,18 +13,18 @@ const Analytics = () => {
   const [analytics, setAnalytics] = useState<any>(null);
   const [qrCode, setQrCode] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isGeneratingQR, setIsGeneratingQR] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [linkRes, analyticsRes, qrRes] = await Promise.all([
+        const [linkRes, analyticsRes] = await Promise.all([
           api.get(`/links/${id}`),
-          api.get(`/links/${id}/analytics?range=30d`),
-          api.get(`/links/${id}/qr`)
+          api.get(`/links/${id}/analytics?range=30d`)
         ]);
         setLink(linkRes.data);
         setAnalytics(analyticsRes.data);
-        setQrCode(qrRes.data.qrCodeUrl);
+        setQrCode(linkRes.data.qrCodeUrl || null);
       } catch (error) {
         toast.error('Failed to load analytics data');
       } finally {
@@ -36,6 +36,22 @@ const Analytics = () => {
       fetchData();
     }
   }, [id, user]);
+
+  const handleGenerateQR = async () => {
+    if (!id) return;
+    setIsGeneratingQR(true);
+    try {
+      const res = await api.post(`/links/${id}/qr`);
+      setQrCode(res.data.qrCodeUrl);
+      toast.success('QR Code generated successfully!');
+    } catch (error: any) {
+      if (error.response?.status !== 403) {
+        toast.error('Failed to generate QR code');
+      }
+    } finally {
+      setIsGeneratingQR(false);
+    }
+  };
 
   if (loading) {
     return <div className="flex h-[calc(100vh-4rem)] items-center justify-center">Loading analytics...</div>;
@@ -78,7 +94,7 @@ const Analytics = () => {
             </div>
           </div>
           
-          {qrCode && (
+          {qrCode ? (
             <div className="flex flex-col items-center gap-3">
               <div className="p-2 bg-white border border-slate-200 rounded-xl shadow-sm">
                 <img src={qrCode} alt="QR Code" className="w-24 h-24" />
@@ -91,6 +107,17 @@ const Analytics = () => {
                 <Download className="h-4 w-4" />
                 Download QR
               </a>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-3">
+              <button 
+                onClick={handleGenerateQR}
+                disabled={isGeneratingQR}
+                className="inline-flex items-center gap-2 rounded-lg bg-indigo-50 px-4 py-2 text-sm font-semibold text-indigo-600 shadow-sm hover:bg-indigo-100 transition-colors disabled:opacity-50"
+              >
+                <QrCode className="h-4 w-4" />
+                {isGeneratingQR ? 'Generating...' : 'Generate QR Code'}
+              </button>
             </div>
           )}
         </div>

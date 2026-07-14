@@ -128,7 +128,8 @@ export const generateQRCode = async (req: Request, res: Response) => {
       return;
     }
 
-    const url = `${req.protocol}://${req.get('host')}/r/${link.slug}`;
+    const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+    const url = `${baseUrl}/r/${link.slug}`;
     const qrCodeDataUrl = await QRCode.toDataURL(url);
 
     link.qrCodeUrl = qrCodeDataUrl;
