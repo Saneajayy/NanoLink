@@ -34,7 +34,7 @@ export const createQr = async (req, res) => {
     if (user.monthlyQrCodeCount >= limitConfig.qrCodesPerMonth) {
       return res.status(403).json({
         error: 'QUOTA_EXCEEDED',
-        message: `You have reached your monthly limit of ${limitConfig.qrCodesPerMonth} QR Codes on the ${user.plan.toUpperCase()} plan. Upgrade to Core for 5 QR codes per month!`
+        message: `You have reached your monthly limit of ${limitConfig.qrCodesPerMonth} QR Codes on the ${user.plan.toUpperCase()} plan. Upgrade to Core for 50 QR codes per month!`
       });
     }
 

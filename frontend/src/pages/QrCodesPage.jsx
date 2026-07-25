@@ -144,7 +144,7 @@ const QrCodesPage = () => {
                 {currentQrCount >= maxQrs ? '⚠️ Free Plan Monthly QR Code Quota Exceeded!' : '⚡ Approaching Your Free Plan Monthly QR Quota'}
               </div>
               <div className="text-xs text-amber-200/80 mt-0.5">
-                You have used <strong className="text-white font-mono">{currentQrCount} of {maxQrs}</strong> QR codes this month. Upgrade to Core for 5 vector QR codes and branded logos!
+                You have used <strong className="text-white font-mono">{currentQrCount} of {maxQrs}</strong> QR codes this month. Upgrade to Core for 50 vector QR codes and branded logos!
               </div>
             </div>
           </div>

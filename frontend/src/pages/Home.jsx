@@ -28,8 +28,8 @@ const Home = () => {
   const navigate = useNavigate();
 
   const [limits, setLimits] = useState({
-    free: { linksPerMonth: 50, customBackHalvesPerMonth: 3, qrCodesPerMonth: 2, analyticsRetentionDays: 7, utmBuilder: false, qrCustomization: 'basic' },
-    core: { linksPerMonth: 100, customBackHalvesPerMonth: null, qrCodesPerMonth: 5, analyticsRetentionDays: 30, utmBuilder: true, qrCustomization: 'advanced' }
+    free: { linksPerMonth: 50, customBackHalvesPerMonth: 5, qrCodesPerMonth: 10, analyticsRetentionDays: 7, utmBuilder: false, qrCustomization: 'basic' },
+    core: { linksPerMonth: 100, customBackHalvesPerMonth: null, qrCodesPerMonth: 50, analyticsRetentionDays: 30, utmBuilder: true, qrCustomization: 'advanced' }
   });
   const [currency, setCurrency] = useState('INR'); // 'INR' or 'USD'
   const [openFaq, setOpenFaq] = useState(0);
