@@ -2,12 +2,13 @@ import express from 'express';
 import passport from 'passport';
 import { signup, login, getMe, logout, googleCallback, getPlanLimits } from '../controllers/authController.js';
 import protect from '../middleware/auth.js';
+import { authLimiter } from '../middleware/rateLimiter.js';
 
 const router = express.Router();
 
 router.get('/limits', getPlanLimits);
-router.post('/signup', signup);
-router.post('/login', login);
+router.post('/signup', authLimiter, signup);
+router.post('/login', authLimiter, login);
 router.post('/logout', logout);
 router.get('/me', protect, getMe);
 

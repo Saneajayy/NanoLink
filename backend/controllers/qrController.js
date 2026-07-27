@@ -49,16 +49,20 @@ export const createQr = async (req, res) => {
       });
     }
 
-    let link;
+    let link = null;
+    let dest = destinationUrl ? destinationUrl.trim() : '';
+    if (dest && !/^https?:\/\//i.test(dest)) dest = 'https://' + dest;
+
     if (linkId) {
       // Generating QR for an existing short link
       link = await Link.findOne({ _id: linkId, owner: user._id, isActive: true });
       if (!link) {
         return res.status(404).json({ error: 'Associated short link not found.' });
       }
-    } else {
+      dest = link.originalUrl;
+    } else if (req.body.createShortLink !== false) {
       // Standalone QR code creation -> automatically create short link behind the scenes per Section 5
-      if (!destinationUrl || !destinationUrl.trim()) {
+      if (!dest) {
         return res.status(400).json({ error: 'Please provide a destination URL.' });
       }
 
@@ -70,20 +74,22 @@ export const createQr = async (req, res) => {
         });
       }
 
-      let dest = destinationUrl.trim();
-      if (!/^https?:\/\//i.test(dest)) dest = 'https://' + dest;
-
       const slug = await generateRandomSlug();
       link = await Link.create({
         slug,
         originalUrl: dest,
         customAlias: false,
         owner: user._id,
-        title: title?.trim() || `QR for ${dest.replace(/^https?:\/\//i, '').substring(0, 30)}`
+        title: title?.trim() || `QR for ${dest.replace(/^https?:\/\//i, '').substring(0, 30)}`,
+        createdFromQr: true
       });
 
       user.monthlyLinkCount += 1;
       await cacheService.cacheRedirect(slug, dest);
+    } else {
+      if (!dest) {
+        return res.status(400).json({ error: 'Please provide a destination URL.' });
+      }
     }
 
     // 3. Generate QR Image Data URI
@@ -92,10 +98,12 @@ export const createQr = async (req, res) => {
       pattern: user.plan === 'core' ? pattern || 'squares' : 'squares',
       cornerStyle: user.plan === 'core' ? cornerStyle || 'square' : 'square',
       frame: user.plan === 'core' ? frame || 'none' : 'none',
+      destinationUrl: dest,
+      title: title?.trim() || (link ? link.title : undefined)
     };
 
     const qrCode = await qrService.createQrForLink(link, user, qrOptions);
-    if (title && title.trim() && linkId) {
+    if (title && title.trim() && link && linkId) {
       // If a title was passed for existing link QR, update link title if blank
       if (!link.title) {
         link.title = title.trim();
@@ -109,7 +117,7 @@ export const createQr = async (req, res) => {
 
     res.status(201).json({
       qrCode: qrCode.toJSON(),
-      link: link.toJSON(),
+      link: link ? link.toJSON() : null,
       quotas: {
         linksUsed: user.monthlyLinkCount,
         linksLimit: limitConfig.linksPerMonth,
@@ -146,7 +154,11 @@ export const getQrCodes = async (req, res) => {
         ]
       }).select('_id');
       const linkIds = matchingLinks.map(l => l._id);
-      query.linkId = { $in: linkIds };
+      query.$or = [
+        { linkId: { $in: linkIds } },
+        { title: { $regex: search, $options: 'i' } },
+        { destinationUrl: { $regex: search, $options: 'i' } }
+      ];
     }
 
     const total = await QrCode.countDocuments(query);
@@ -156,8 +168,11 @@ export const getQrCodes = async (req, res) => {
       .limit(limit)
       .populate('linkId');
 
-    // Filter out orphaned QR codes where link was hard-deleted
-    const validQrCodes = qrCodes.filter(qr => qr.linkId && qr.linkId.isActive !== false);
+    // Filter out orphaned QR codes where link was hard-deleted, but allow static QR codes (where linkId is null)
+    const validQrCodes = qrCodes.filter(qr => {
+      if (qr.linkId) return qr.linkId.isActive !== false;
+      return true;
+    });
 
     res.json({
       qrCodes: validQrCodes.map(qr => qr.toJSON()),
@@ -180,7 +195,7 @@ export const getQrCodes = async (req, res) => {
 export const getQrById = async (req, res) => {
   try {
     const qrCode = await QrCode.findOne({ _id: req.params.id, owner: req.user._id }).populate('linkId');
-    if (!qrCode || !qrCode.linkId || !qrCode.linkId.isActive) {
+    if (!qrCode || (qrCode.linkId && qrCode.linkId.isActive === false)) {
       return res.status(404).json({ error: 'QR Code not found or associated link is inactive.' });
     }
     res.json(qrCode.toJSON());
@@ -198,7 +213,7 @@ export const updateQr = async (req, res) => {
     const { color, pattern, cornerStyle, frame, title, destinationUrl } = req.body;
 
     const qrCode = await QrCode.findOne({ _id: req.params.id, owner: user._id }).populate('linkId');
-    if (!qrCode || !qrCode.linkId || !qrCode.linkId.isActive) {
+    if (!qrCode || (qrCode.linkId && qrCode.linkId.isActive === false)) {
       return res.status(404).json({ error: 'QR Code not found.' });
     }
 
@@ -222,21 +237,34 @@ export const updateQr = async (req, res) => {
       if (frame !== undefined) qrCode.frame = frame;
     }
 
-    // Update underlying link destination if changed
     const link = qrCode.linkId;
-    if (destinationUrl !== undefined && destinationUrl.trim()) {
-      let dest = destinationUrl.trim();
-      if (!/^https?:\/\//i.test(dest)) dest = 'https://' + dest;
-      link.originalUrl = dest;
-      await cacheService.cacheRedirect(link.slug, dest);
+    let targetUrl;
+    if (link) {
+      if (destinationUrl !== undefined && destinationUrl.trim()) {
+        let dest = destinationUrl.trim();
+        if (!/^https?:\/\//i.test(dest)) dest = 'https://' + dest;
+        link.originalUrl = dest;
+        await cacheService.cacheRedirect(link.slug, dest);
+      }
+      if (title !== undefined) {
+        link.title = title.trim();
+      }
+      await link.save();
+      targetUrl = link.shortUrl;
+    } else {
+      if (destinationUrl !== undefined && destinationUrl.trim()) {
+        let dest = destinationUrl.trim();
+        if (!/^https?:\/\//i.test(dest)) dest = 'https://' + dest;
+        qrCode.destinationUrl = dest;
+      }
+      if (title !== undefined) {
+        qrCode.title = title.trim();
+      }
+      targetUrl = qrCode.destinationUrl || 'https://nano.link';
     }
-    if (title !== undefined) {
-      link.title = title.trim();
-    }
-    await link.save();
 
     // Regenerate QR image with new styles
-    const newImageUrl = await qrService.generateQrImage(link.shortUrl, {
+    const newImageUrl = await qrService.generateQrImage(targetUrl, {
       color: qrCode.color,
       pattern: qrCode.pattern,
       cornerStyle: qrCode.cornerStyle,
@@ -262,8 +290,15 @@ export const deleteQr = async (req, res) => {
       return res.status(404).json({ error: 'QR Code not found.' });
     }
 
-    // Unlink from Link
-    await Link.findByIdAndUpdate(qrCode.linkId, { $unset: { qrCodeId: 1 } });
+    // Soft-delete underlying link and remove from cache if present
+    if (qrCode.linkId) {
+      const link = await Link.findById(qrCode.linkId);
+      if (link) {
+        link.isActive = false;
+        await link.save();
+        await cacheService.removeCachedRedirect(link.slug);
+      }
+    }
     await QrCode.deleteOne({ _id: qrCode._id });
 
     res.json({ message: 'QR Code deleted successfully.', id: qrCode._id });

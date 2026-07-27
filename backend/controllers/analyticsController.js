@@ -29,6 +29,12 @@ export const getAnalytics = async (req, res) => {
     const user = req.user;
     const { linkId, range = '7d' } = req.query;
 
+    if (user.plan !== 'core' && (range === '30d' || range === 'all')) {
+      return res.status(403).json({ 
+        error: '30-day and All-time analytical history are available exclusively on the Core plan. Upgrade to unlock extended analytics!' 
+      });
+    }
+
     // 1. Find all links owned by user
     const userLinks = await Link.find({ owner: user._id }).select('_id slug shortUrl title totalClicks');
     let targetLinkIds = userLinks.map(l => l._id);
@@ -199,6 +205,12 @@ export const exportCsv = async (req, res) => {
   try {
     const user = req.user;
     const { linkId, range = '7d' } = req.query;
+
+    if (user.plan !== 'core' && (range === '30d' || range === 'all')) {
+      return res.status(403).json({ 
+        error: '30-day and All-time analytical exports are available exclusively on the Core plan. Upgrade to unlock extended exports!' 
+      });
+    }
 
     const userLinks = await Link.find({ owner: user._id });
     const linkMap = {};

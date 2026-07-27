@@ -16,37 +16,37 @@ import BillingPage from './pages/BillingPage';
 import SettingsPage from './pages/SettingsPage';
 
 const App = () => {
-  return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/not-found-redirect" element={<NotFoundRedirect />} />
-          <Route path="/404-link" element={<NotFoundRedirect />} />
+ return (
+ <AuthProvider>
+ <BrowserRouter>
+ <Routes>
+ {/* Public Routes */}
+ <Route path="/" element={<Home />} />
+ <Route path="/login" element={<Login />} />
+ <Route path="/signup" element={<Signup />} />
+ <Route path="/not-found-redirect" element={<NotFoundRedirect />} />
+ <Route path="/404-link" element={<NotFoundRedirect />} />
 
-          {/* Protected Dashboard Routes */}
-          <Route path="/dashboard" element={
-            <ProtectedRoute>
-              <DashboardLayout />
-            </ProtectedRoute>
-          }>
-            <Route index element={<DashboardHome />} />
-            <Route path="links" element={<LinksPage />} />
-            <Route path="qr-codes" element={<QrCodesPage />} />
-            <Route path="analytics" element={<AnalyticsPage />} />
-            <Route path="billing" element={<BillingPage />} />
-            <Route path="settings" element={<SettingsPage />} />
-          </Route>
+ {/* Protected Dashboard Routes */}
+ <Route path="/dashboard" element={
+ <ProtectedRoute>
+ <DashboardLayout />
+ </ProtectedRoute>
+ }>
+ <Route index element={<DashboardHome />} />
+ <Route path="links" element={<LinksPage />} />
+ <Route path="qr-codes" element={<QrCodesPage />} />
+ <Route path="analytics" element={<AnalyticsPage />} />
+ <Route path="billing" element={<BillingPage />} />
+ <Route path="settings" element={<SettingsPage />} />
+ </Route>
 
-          {/* Catch-all fallback */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
-  );
+ {/* Catch-all fallback */}
+ <Route path="*" element={<Navigate to="/" replace />} />
+ </Routes>
+ </BrowserRouter>
+ </AuthProvider>
+ );
 };
 
 export default App;

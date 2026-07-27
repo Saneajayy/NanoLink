@@ -168,23 +168,23 @@ const SettingsPage = () => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8 pb-16">
+    <div className="max-w-5xl mx-auto space-y-8 pb-16 bg-white font-light">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-200 pb-6">
         <div>
-          <h1 className="text-2xl font-black text-white tracking-tight">Account Settings</h1>
-          <p className="text-sm text-slate-400 mt-1">Manage your profile, security credentials, API integrations, and domain preferences.</p>
+          <h1 className="text-2xl font-bold text-black tracking-tight">Account Settings</h1>
+          <p className="text-sm font-light text-neutral-600 mt-1">Manage your profile, security credentials, API integrations, and domain preferences.</p>
         </div>
-        <div className="flex items-center gap-3 bg-slate-900 px-4 py-2 rounded-xl border border-slate-800">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-600 to-orange-500 flex items-center justify-center font-bold text-white text-xs">
+        <div className="flex items-center gap-3 bg-white px-4 py-2 border border-neutral-200 shadow-sm">
+          <div className="w-8 h-8 bg-[#FF6206] flex items-center justify-center font-bold text-white text-xs rounded-sm">
             {user?.name?.charAt(0)?.toUpperCase() || 'U'}
           </div>
           <div>
-            <div className="text-xs font-bold text-white flex items-center gap-1.5">
+            <div className="text-xs font-bold text-black flex items-center gap-1.5">
               <span>{user?.name}</span>
-              {user?.plan === 'core' && <Crown className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />}
+              {user?.plan === 'core' && <Crown className="w-3.5 h-3.5 text-[#FF6206]" />}
             </div>
-            <div className="text-[11px] text-slate-500 font-mono">{user?.email}</div>
+            <div className="text-[11px] font-mono font-normal text-neutral-500">{user?.email}</div>
           </div>
         </div>
       </div>
@@ -194,72 +194,72 @@ const SettingsPage = () => {
         <div className="lg:col-span-2 space-y-8">
           
           {/* Card 1: Profile & Preferences */}
-          <div className="bg-slate-900/60 border border-slate-800 rounded-3xl p-6 md:p-8 space-y-6 shadow-xl">
-            <div className="flex items-center gap-3 border-b border-slate-800/80 pb-4">
-              <User className="w-5 h-5 text-indigo-400" />
-              <h2 className="text-lg font-bold text-white">Profile & Preferences</h2>
+          <div className="bg-white border border-neutral-200 p-6 md:p-8 space-y-6 shadow-sm">
+            <div className="flex items-center gap-3 border-b border-neutral-200 pb-4">
+              <User className="w-5 h-5 text-[#FF6206]" />
+              <h2 className="text-lg font-bold text-black">Profile & Preferences</h2>
             </div>
 
             {profileMessage.text && (
-              <div className={`p-4 rounded-xl text-xs font-semibold flex items-center gap-2.5 ${
-                profileMessage.type === 'success' ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-400' : 'bg-rose-500/10 border border-rose-500/30 text-rose-400'
+              <div className={`p-4 border text-xs font-medium flex items-center gap-2.5 rounded-sm shadow-sm ${
+                profileMessage.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-600'
               }`}>
-                {profileMessage.type === 'success' ? <CheckCircle2 className="w-4 h-4 shrink-0" /> : <AlertCircle className="w-4 h-4 shrink-0" />}
+                {profileMessage.type === 'success' ? <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" /> : <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />}
                 <span>{profileMessage.text}</span>
               </div>
             )}
 
             <form onSubmit={handleProfileSubmit} className="space-y-5">
               <div>
-                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Display Name</label>
+                <label className="block text-xs font-semibold text-neutral-700 uppercase tracking-wider mb-2">Display Name</label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white font-medium focus:outline-none focus:border-indigo-500 transition-colors"
+                  className="w-full bg-white border border-neutral-200 px-4 py-2.5 text-sm text-black font-normal focus:outline-none focus:border-neutral-400 shadow-sm"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Registered Email Address</label>
-                <div className="flex items-center gap-3 bg-slate-950/60 border border-slate-800/60 rounded-xl px-4 py-2.5 text-sm text-slate-400 cursor-not-allowed">
-                  <Mail className="w-4 h-4 text-slate-500" />
-                  <span className="flex-1 font-mono">{user?.email}</span>
-                  <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 text-[10px] font-bold uppercase rounded border border-emerald-500/20">Verified</span>
+                <label className="block text-xs font-semibold text-neutral-700 uppercase tracking-wider mb-2">Registered Email Address</label>
+                <div className="flex items-center gap-3 bg-neutral-50 border border-neutral-200 px-4 py-2.5 text-sm text-neutral-600 cursor-not-allowed shadow-inner">
+                  <Mail className="w-4 h-4 text-neutral-400" />
+                  <span className="flex-1 font-mono font-medium">{user?.email}</span>
+                  <span className="px-2 py-0.5 bg-neutral-200 text-neutral-700 text-[10px] font-semibold uppercase rounded-sm">Verified</span>
                 </div>
-                <p className="text-[11px] text-slate-500 mt-1.5">Email addresses are permanently tied to account ownership and billing records.</p>
+                <p className="text-[11px] font-light text-neutral-500 mt-1.5">Email addresses are permanently tied to account ownership and billing records.</p>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Default Short Domain</label>
+                <label className="block text-xs font-semibold text-neutral-700 uppercase tracking-wider mb-2">Default Short Domain</label>
                 <div className="grid grid-cols-3 gap-3">
                   {['nano.link', 'nn.lk', 'nanolink.io'].map(d => (
                     <button
                       key={d}
                       type="button"
                       onClick={() => setDefaultDomain(d)}
-                      className={`p-3 rounded-xl border text-center text-xs font-bold transition-all flex flex-col items-center gap-1.5 cursor-pointer ${
+                      className={`p-3 border text-center text-xs font-medium transition-all flex flex-col items-center gap-1.5 cursor-pointer rounded-sm ${
                         defaultDomain === d 
-                          ? 'bg-indigo-600/15 border-indigo-500 text-white shadow-lg shadow-indigo-500/10' 
-                          : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-200'
+                          ? 'bg-[#FF6206] text-white border-[#FF6206] shadow-sm' 
+                          : 'bg-white text-black border-neutral-200 hover:bg-neutral-50 shadow-sm'
                       }`}
                     >
-                      <Globe className={`w-4 h-4 ${defaultDomain === d ? 'text-indigo-400' : 'text-slate-600'}`} />
+                      <Globe className={`w-4 h-4 ${defaultDomain === d ? 'text-white' : 'text-neutral-500'}`} />
                       <span>{d}</span>
                     </button>
                   ))}
                 </div>
-                <p className="text-[11px] text-slate-500 mt-1.5">When creating short links from your dashboard, this domain will be selected by default.</p>
+                <p className="text-[11px] font-light text-neutral-500 mt-1.5">When creating short links from your dashboard, this domain will be selected by default.</p>
               </div>
 
               <div className="pt-2">
                 <button
                   type="submit"
                   disabled={profileLoading}
-                  className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold text-xs rounded-xl shadow-lg shadow-indigo-600/20 transition-all flex items-center gap-2 cursor-pointer"
+                  className="px-6 py-2.5 bg-[#FF6206] hover:bg-[#FF6206]/90 disabled:opacity-50 text-white font-medium text-xs transition-all flex items-center gap-2 cursor-pointer shadow-sm"
                 >
-                  {profileLoading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                  {profileLoading ? <RefreshCw className="w-4 h-4 animate-spin rounded-full" /> : <Check className="w-4 h-4" />}
                   <span>Save Profile Preferences</span>
                 </button>
               </div>
@@ -267,50 +267,50 @@ const SettingsPage = () => {
           </div>
 
           {/* Card 2: Security & Password Change via Email Verification (User Instruction) */}
-          <div className="bg-slate-900/60 border border-slate-800 rounded-3xl p-6 md:p-8 space-y-6 shadow-xl">
-            <div className="flex items-center justify-between border-b border-slate-800/80 pb-4">
+          <div className="bg-white border border-neutral-200 p-6 md:p-8 space-y-6 shadow-sm">
+            <div className="flex items-center justify-between border-b border-neutral-200 pb-4">
               <div className="flex items-center gap-3">
-                <Lock className="w-5 h-5 text-orange-400" />
-                <h2 className="text-lg font-bold text-white">Security & Password Management</h2>
+                <Lock className="w-5 h-5 text-[#FF6206]" />
+                <h2 className="text-lg font-bold text-black">Security & Password Management</h2>
               </div>
-              <span className="px-2.5 py-1 bg-orange-500/10 text-orange-400 border border-orange-500/20 text-[10px] font-bold uppercase tracking-wider rounded-full flex items-center gap-1">
+              <span className="px-2.5 py-1 bg-neutral-100 text-[#FF6206] border border-neutral-200 text-[10px] font-semibold uppercase tracking-wider flex items-center gap-1 rounded-sm shadow-sm">
                 <ShieldCheck className="w-3 h-3" /> Email OTP Protected
               </span>
             </div>
 
             {user?.authProvider === 'google' ? (
-              <div className="p-5 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-xs text-indigo-300 leading-relaxed space-y-2">
-                <div className="font-bold text-sm text-indigo-200 flex items-center gap-2">
-                  <ShieldCheck className="w-4 h-4 text-indigo-400" /> Google OAuth Account Security
+              <div className="p-5 bg-neutral-50 border border-neutral-200 text-xs font-light text-neutral-700 leading-relaxed space-y-2 rounded-sm shadow-sm">
+                <div className="font-bold text-sm text-black flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-[#FF6206]" /> Google OAuth Account Security
                 </div>
                 <p>You signed in to NanoLink using your Google Account. Your authentication is secured directly by Google OAuth 2.0. You do not need a separate local password.</p>
               </div>
             ) : (
               <div className="space-y-6">
-                <p className="text-xs text-slate-400 leading-relaxed">
-                  To protect your account from unauthorized changes, updating your password requires verifying a 6-digit one-time password (OTP) sent to your registered email address (<strong className="text-slate-200 font-mono">{user?.email}</strong>).
+                <p className="text-xs font-light text-neutral-600 leading-relaxed">
+                  To protect your account from unauthorized changes, updating your password requires verifying a 6-digit one-time password (OTP) sent to your registered email address (<strong className="text-black font-mono font-medium">{user?.email}</strong>).
                 </p>
 
                 {passwordMessage.text && (
-                  <div className={`p-4 rounded-xl text-xs font-semibold space-y-2 ${
-                    passwordMessage.type === 'success' ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-400' : 'bg-rose-500/10 border border-rose-500/30 text-rose-400'
+                  <div className={`p-4 text-xs font-medium space-y-2 border rounded-sm shadow-sm ${
+                    passwordMessage.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-600'
                   }`}>
                     <div className="flex items-center gap-2">
-                      {passwordMessage.type === 'success' ? <CheckCircle2 className="w-4 h-4 shrink-0" /> : <AlertCircle className="w-4 h-4 shrink-0" />}
+                      {passwordMessage.type === 'success' ? <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" /> : <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />}
                       <span>{passwordMessage.text}</span>
                     </div>
 
                     {/* Zero-Config Dev Mode Helper per user instruction: "i will provide the key later, use any smtp SERVICE THATS FREE" */}
                     {passwordMessage.mockOtp && (
-                      <div className="mt-2 p-3 bg-slate-950 border border-amber-500/30 rounded-lg text-amber-300 font-mono text-xs flex items-center justify-between">
+                      <div className="mt-2 p-3 bg-white border border-neutral-200 text-black font-mono text-xs flex items-center justify-between rounded-sm shadow-inner">
                         <div>
-                          <span className="text-[10px] text-amber-500 uppercase block font-bold">💡 Zero-Config Dev Mode OTP Code:</span>
-                          <span className="text-base font-black tracking-widest">{passwordMessage.mockOtp}</span>
+                          <span className="text-[10px] text-[#FF6206] uppercase block font-semibold">💡 Zero-Config Dev Mode OTP Code:</span>
+                          <span className="text-base font-bold tracking-widest">{passwordMessage.mockOtp}</span>
                         </div>
                         <button
                           type="button"
                           onClick={() => setOtpCode(passwordMessage.mockOtp)}
-                          className="px-3 py-1 bg-amber-500 text-slate-950 font-bold text-[11px] rounded hover:bg-amber-400 cursor-pointer"
+                          className="px-3 py-1 bg-[#FF6206] text-white font-medium text-[11px] hover:bg-[#FF6206]/90 cursor-pointer shadow-sm rounded-sm"
                         >
                           Auto-Fill OTP
                         </button>
@@ -321,41 +321,41 @@ const SettingsPage = () => {
 
                 {/* Step 1: Request OTP Button */}
                 {!otpSent ? (
-                  <div className="p-6 rounded-2xl bg-slate-950 border border-slate-800/80 text-center space-y-4">
-                    <div className="w-12 h-12 rounded-2xl bg-orange-500/10 text-orange-400 flex items-center justify-center mx-auto">
+                  <div className="p-6 bg-neutral-50 border border-neutral-200 text-center space-y-4 rounded-sm shadow-sm">
+                    <div className="w-12 h-12 bg-white border border-neutral-200 text-[#FF6206] flex items-center justify-center mx-auto shadow-sm rounded-full">
                       <Send className="w-6 h-6" />
                     </div>
                     <div>
-                      <h3 className="text-sm font-bold text-white">Ready to change your password?</h3>
-                      <p className="text-xs text-slate-500 mt-1">Click below to generate and deliver a secure verification code to your email.</p>
+                      <h3 className="text-sm font-bold text-black">Ready to change your password?</h3>
+                      <p className="text-xs font-light text-neutral-600 mt-1">Click below to generate and deliver a secure verification code to your email.</p>
                     </div>
                     <button
                       type="button"
                       onClick={handleRequestOtp}
                       disabled={otpLoading}
-                      className="px-6 py-3 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 disabled:opacity-50 text-slate-950 font-extrabold text-xs rounded-xl shadow-lg shadow-orange-500/20 transition-all flex items-center gap-2 mx-auto cursor-pointer"
+                      className="px-6 py-3 bg-[#FF6206] hover:bg-[#FF6206]/90 disabled:opacity-50 text-white font-medium text-xs transition-all flex items-center gap-2 mx-auto cursor-pointer shadow-sm"
                     >
-                      {otpLoading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                      {otpLoading ? <RefreshCw className="w-4 h-4 animate-spin rounded-full" /> : <Send className="w-4 h-4" />}
                       <span>Send Verification Code to Email</span>
                     </button>
                   </div>
                 ) : (
                   /* Step 2: Verify OTP and Set New Password Form */
-                  <form onSubmit={handlePasswordSubmit} className="space-y-5 p-6 rounded-2xl bg-slate-950 border border-slate-800/80">
+                  <form onSubmit={handlePasswordSubmit} className="space-y-5 p-6 bg-neutral-50 border border-neutral-200 rounded-sm shadow-sm">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-orange-400 uppercase tracking-wider">Step 2: Enter Verification Code</span>
+                      <span className="text-xs font-semibold text-[#FF6206] uppercase tracking-wider">Step 2: Enter Verification Code</span>
                       <button
                         type="button"
                         onClick={handleRequestOtp}
                         disabled={otpLoading}
-                        className="text-[11px] font-semibold text-slate-400 hover:text-white underline cursor-pointer"
+                        className="text-[11px] font-medium text-black hover:underline cursor-pointer"
                       >
                         Resend Code
                       </button>
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">6-Digit Email OTP Code</label>
+                      <label className="block text-xs font-semibold text-neutral-700 uppercase tracking-wider mb-2">6-Digit Email OTP Code</label>
                       <input
                         type="text"
                         value={otpCode}
@@ -363,13 +363,13 @@ const SettingsPage = () => {
                         placeholder="e.g. 849201"
                         required
                         maxLength={6}
-                        className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-lg text-center text-white font-mono font-bold tracking-[0.5em] focus:outline-none focus:border-orange-500 transition-colors"
+                        className="w-full bg-white border border-neutral-200 px-4 py-3 text-lg text-center text-black font-mono font-bold tracking-[0.5em] focus:outline-none focus:border-neutral-400 shadow-sm"
                       />
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">New Password</label>
+                        <label className="block text-xs font-semibold text-neutral-700 uppercase tracking-wider mb-2">New Password</label>
                         <div className="relative">
                           <input
                             type={showPassword ? "text" : "password"}
@@ -377,12 +377,12 @@ const SettingsPage = () => {
                             onChange={(e) => setNewPassword(e.target.value)}
                             placeholder="At least 8 chars + special char..."
                             required
-                            className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white font-medium focus:outline-none focus:border-orange-500 pr-10"
+                            className="w-full bg-white border border-neutral-200 px-4 py-2.5 text-sm text-black font-normal focus:outline-none focus:border-neutral-400 pr-10 shadow-sm"
                           />
                           <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
                           >
                             {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                           </button>
@@ -390,36 +390,36 @@ const SettingsPage = () => {
                       </div>
 
                       <div>
-                        <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Confirm New Password</label>
+                        <label className="block text-xs font-semibold text-neutral-700 uppercase tracking-wider mb-2">Confirm New Password</label>
                         <input
                           type={showPassword ? "text" : "password"}
                           value={confirmPassword}
                           onChange={(e) => setConfirmPassword(e.target.value)}
                           placeholder="Re-enter new password..."
                           required
-                          className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white font-medium focus:outline-none focus:border-orange-500"
+                          className="w-full bg-white border border-neutral-200 px-4 py-2.5 text-sm text-black font-normal focus:outline-none focus:border-neutral-400 shadow-sm"
                         />
                       </div>
                     </div>
 
-                    <p className="text-[11px] text-slate-500">
-                      Password policy: Must be at least 8 characters long and contain at least one special symbol (<code className="text-slate-400">!@#$%^&*</code>).
+                    <p className="text-[11px] font-light text-neutral-500">
+                      Password policy: Must be at least 8 characters long and contain at least one special symbol (<code className="text-black font-medium">!@#$%^&*</code>).
                     </p>
 
                     <div className="pt-2 flex items-center justify-end gap-3">
                       <button
                         type="button"
                         onClick={() => setOtpSent(false)}
-                        className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-slate-400 text-xs font-bold rounded-xl"
+                        className="px-4 py-2 bg-white hover:bg-neutral-100 text-black text-xs font-medium border border-neutral-200 cursor-pointer shadow-sm"
                       >
                         Cancel
                       </button>
                       <button
                         type="submit"
                         disabled={passwordLoading || otpCode.length < 6}
-                        className="px-6 py-2.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 disabled:opacity-50 text-slate-950 font-extrabold text-xs rounded-xl shadow-lg shadow-orange-500/20 transition-all flex items-center gap-2 cursor-pointer"
+                        className="px-6 py-2.5 bg-[#FF6206] hover:bg-[#FF6206]/90 disabled:opacity-50 text-white font-medium text-xs transition-all flex items-center gap-2 cursor-pointer shadow-sm"
                       >
-                        {passwordLoading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <ShieldCheck className="w-4 h-4" />}
+                        {passwordLoading ? <RefreshCw className="w-4 h-4 animate-spin rounded-full" /> : <ShieldCheck className="w-4 h-4" />}
                         <span>Verify Code & Update Password</span>
                       </button>
                     </div>
@@ -434,45 +434,45 @@ const SettingsPage = () => {
         <div className="space-y-8">
           
           {/* Card 3: Developer API & Webhooks */}
-          <div className="bg-slate-900/60 border border-slate-800 rounded-3xl p-6 space-y-5 shadow-xl">
-            <div className="flex items-center gap-3 border-b border-slate-800/80 pb-4">
-              <Key className="w-5 h-5 text-purple-400" />
-              <h2 className="text-base font-bold text-white">Developer API Key</h2>
+          <div className="bg-white border border-neutral-200 p-6 space-y-5 shadow-sm">
+            <div className="flex items-center gap-3 border-b border-neutral-200 pb-4">
+              <Key className="w-5 h-5 text-[#FF6206]" />
+              <h2 className="text-base font-bold text-black">Developer API Key</h2>
             </div>
 
-            <p className="text-xs text-slate-400 leading-relaxed">
+            <p className="text-xs font-light text-neutral-600 leading-relaxed">
               Use your personal API key to programmatically shorten links, retrieve click analytics, and trigger automated QR matrix generation.
             </p>
 
-            <div className="bg-slate-950 border border-slate-800 rounded-xl p-3">
-              <div className="text-[10px] font-bold text-slate-500 uppercase mb-1">Your Bearer Token:</div>
+            <div className="bg-neutral-50 border border-neutral-200 p-3 rounded-sm shadow-inner">
+              <div className="text-[10px] font-semibold text-neutral-500 uppercase mb-1">Your Bearer Token:</div>
               {apiKey ? (
-                <div className="flex items-center justify-between gap-2 font-mono text-xs text-purple-300">
+                <div className="flex items-center justify-between gap-2 font-mono text-xs text-black font-semibold">
                   <span className="truncate">{apiKey}</span>
                   <button
                     onClick={copyApiKey}
-                    className="p-1.5 hover:bg-slate-800 text-slate-400 hover:text-white rounded-lg transition-colors cursor-pointer shrink-0"
+                    className="p-1.5 hover:bg-neutral-200 text-neutral-600 hover:text-black transition-colors cursor-pointer shrink-0 rounded-sm"
                     title="Copy API Key"
                   >
-                    {apiKeyCopied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+                    {apiKeyCopied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
                   </button>
                 </div>
               ) : (
-                <div className="text-xs text-slate-600 italic py-1">No API key generated yet.</div>
+                <div className="text-xs font-light text-neutral-400 italic py-1">No API key generated yet.</div>
               )}
             </div>
 
             <button
               onClick={handleGenerateApiKey}
               disabled={apiKeyLoading}
-              className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-white font-bold text-xs rounded-xl border border-slate-700 transition-all flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full py-2.5 bg-[#FF6206] hover:bg-[#FF6206]/90 disabled:opacity-50 text-white font-medium text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm"
             >
-              {apiKeyLoading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Key className="w-4 h-4 text-purple-400" />}
+              {apiKeyLoading ? <RefreshCw className="w-4 h-4 animate-spin rounded-full" /> : <Key className="w-4 h-4 text-white" />}
               <span>{apiKey ? "Regenerate API Key" : "Generate Personal API Key"}</span>
             </button>
 
             {apiKey && (
-              <p className="text-[11px] text-amber-400/80 flex items-center gap-1.5">
+              <p className="text-[11px] font-medium text-[#FF6206] flex items-center gap-1.5">
                 <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
                 <span>Regenerating will immediately invalidate your existing key.</span>
               </p>
@@ -480,15 +480,15 @@ const SettingsPage = () => {
           </div>
 
           {/* Card 4: Danger Zone — Account Deletion per Section 6.11 */}
-          <div className="bg-rose-950/10 border border-rose-500/30 rounded-3xl p-6 space-y-5 shadow-xl">
-            <div className="flex items-center gap-2.5 text-rose-400 font-bold text-base border-b border-rose-500/20 pb-4">
+          <div className="bg-red-50/40 border border-red-200 p-6 space-y-5 shadow-sm">
+            <div className="flex items-center gap-2.5 text-red-600 font-bold text-base border-b border-red-200 pb-4">
               <AlertTriangle className="w-5 h-5 shrink-0" />
               <span>Danger Zone</span>
             </div>
 
             <div className="space-y-2">
-              <h3 className="text-sm font-bold text-white">Delete Workspace & Account</h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
+              <h3 className="text-sm font-bold text-black">Delete Workspace & Account</h3>
+              <p className="text-xs font-light text-neutral-600 leading-relaxed">
                 Permanently delete your account and all associated short URLs, physical QR codes, analytics event streams, and billing records. This action cannot be reversed.
               </p>
             </div>
@@ -496,7 +496,7 @@ const SettingsPage = () => {
             <button
               type="button"
               onClick={() => setShowDeleteModal(true)}
-              className="w-full py-2.5 bg-rose-500/10 hover:bg-rose-500 text-rose-400 hover:text-slate-950 font-bold text-xs rounded-xl border border-rose-500/30 transition-all flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full py-2.5 bg-white hover:bg-red-600 text-red-600 hover:text-white font-medium text-xs border border-red-200 hover:border-red-600 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm"
             >
               <Trash2 className="w-4 h-4" />
               <span>Delete Account...</span>
@@ -508,21 +508,21 @@ const SettingsPage = () => {
 
       {/* Permanent Account Deletion Confirmation Modal per Section 6.11 */}
       {showDeleteModal && (
-        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-rose-500/40 rounded-3xl max-w-md w-full p-6 md:p-8 space-y-6 shadow-2xl animate-in fade-in zoom-in duration-200">
-            <div className="flex items-center gap-3 text-rose-400">
-              <div className="w-10 h-10 rounded-2xl bg-rose-500/10 flex items-center justify-center shrink-0">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white border border-neutral-200 max-w-md w-full p-6 md:p-8 space-y-6 shadow-xl rounded-md animate-in fade-in zoom-in duration-200">
+            <div className="flex items-center gap-3 text-red-600">
+              <div className="w-10 h-10 bg-red-50 border border-red-200 flex items-center justify-center shrink-0 rounded-full">
                 <AlertTriangle className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="text-lg font-black text-white">Permanently Delete Account?</h3>
-                <p className="text-xs text-rose-400/90 font-semibold">This action is irreversible.</p>
+                <h3 className="text-lg font-bold text-black">Permanently Delete Account?</h3>
+                <p className="text-xs text-red-600 font-medium">This action is irreversible.</p>
               </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-300 space-y-2 leading-relaxed font-mono">
-              <p>By typing <strong className="text-rose-400">DELETE</strong>, you authorize NanoLink to immediately purge:</p>
-              <ul className="list-disc pl-4 space-y-1 text-slate-400 text-[11px]">
+            <div className="p-4 bg-neutral-50 border border-neutral-200 text-xs font-normal text-black space-y-2 leading-relaxed font-mono rounded-sm shadow-inner">
+              <p className="font-medium">By typing <strong className="text-red-600">DELETE</strong>, you authorize NanoLink to immediately purge:</p>
+              <ul className="list-disc pl-4 space-y-1 text-neutral-700 font-light text-[11px]">
                 <li>All shortened links and back-halves</li>
                 <li>All custom vector QR codes</li>
                 <li>All Redis redirect cache entries</li>
@@ -532,7 +532,7 @@ const SettingsPage = () => {
             </div>
 
             {deleteError && (
-              <div className="p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl text-xs font-semibold text-rose-400 flex items-center gap-2">
+              <div className="p-3 bg-red-50 border border-red-200 text-xs font-medium text-red-600 flex items-center gap-2 rounded-sm shadow-sm">
                 <AlertCircle className="w-4 h-4 shrink-0" />
                 <span>{deleteError}</span>
               </div>
@@ -540,8 +540,8 @@ const SettingsPage = () => {
 
             <form onSubmit={handleDeleteAccount} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
-                  Type <span className="text-rose-400 font-mono">DELETE</span> to confirm
+                <label className="block text-xs font-semibold text-neutral-700 uppercase tracking-wider mb-2">
+                  Type <span className="text-red-600 font-mono">DELETE</span> to confirm
                 </label>
                 <input
                   type="text"
@@ -549,13 +549,13 @@ const SettingsPage = () => {
                   onChange={(e) => setDeleteConfirmText(e.target.value)}
                   placeholder="DELETE"
                   required
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white font-mono font-bold focus:outline-none focus:border-rose-500"
+                  className="w-full bg-white border border-neutral-200 px-4 py-2.5 text-sm text-black font-mono font-bold focus:outline-none focus:border-red-500 shadow-sm"
                 />
               </div>
 
               {user?.authProvider === 'local' && user?.password && (
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
+                  <label className="block text-xs font-semibold text-neutral-700 uppercase tracking-wider mb-2">
                     Enter Current Password
                   </label>
                   <input
@@ -564,7 +564,7 @@ const SettingsPage = () => {
                     onChange={(e) => setDeletePassword(e.target.value)}
                     placeholder="Verify your password..."
                     required
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white font-medium focus:outline-none focus:border-rose-500"
+                    className="w-full bg-white border border-neutral-200 px-4 py-2.5 text-sm text-black font-normal focus:outline-none focus:border-red-500 shadow-sm"
                   />
                 </div>
               )}
@@ -574,16 +574,16 @@ const SettingsPage = () => {
                   type="button"
                   onClick={() => setShowDeleteModal(false)}
                   disabled={deleteLoading}
-                  className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-xl cursor-pointer"
+                  className="px-5 py-2.5 bg-white hover:bg-neutral-100 text-black text-xs font-medium border border-neutral-200 cursor-pointer shadow-sm"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={deleteLoading || deleteConfirmText !== 'DELETE'}
-                  className="px-6 py-2.5 bg-rose-600 hover:bg-rose-500 disabled:opacity-50 text-white font-extrabold text-xs rounded-xl shadow-lg shadow-rose-600/30 transition-all flex items-center gap-2 cursor-pointer"
+                  className="px-6 py-2.5 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-medium text-xs transition-all flex items-center gap-2 cursor-pointer shadow-sm"
                 >
-                  {deleteLoading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                  {deleteLoading ? <RefreshCw className="w-4 h-4 animate-spin rounded-full" /> : <Trash2 className="w-4 h-4" />}
                   <span>Permanently Delete Account</span>
                 </button>
               </div>

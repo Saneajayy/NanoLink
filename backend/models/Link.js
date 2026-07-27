@@ -36,6 +36,10 @@ const linkSchema = new mongoose.Schema({
     ref: 'QrCode',
     default: null
   },
+  createdFromQr: {
+    type: Boolean,
+    default: false
+  },
   utmParams: {
     source: { type: String, default: '' },
     medium: { type: String, default: '' },

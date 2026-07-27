@@ -13,7 +13,7 @@ import billingRoutes from './routes/billingRoutes.js';
 import settingsRoutes from './routes/settingsRoutes.js';
 import { redirectSlug } from './controllers/linkController.js';
 import startAnalyticsWorker from './services/analyticsWorker.js';
-import { apiLimiter, authLimiter, redirectLimiter } from './middleware/rateLimiter.js';
+import { apiLimiter, redirectLimiter } from './middleware/rateLimiter.js';
 
 dotenv.config();
 
@@ -29,14 +29,20 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(passport.initialize());
 
-// Apply global API rate limiting per Section 8
-app.use('/api', apiLimiter);
+// Apply global API rate limiting per Section 8 and disable browser caching of API endpoints
+app.use('/api', (req, res, next) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  res.setHeader('Surrogate-Control', 'no-store');
+  next();
+}, apiLimiter);
 
 // Public Redirect Route per Section 5 & 8 (protected by high-throughput redirect limiter)
 app.get('/r/:slug', redirectLimiter, redirectSlug);
 
 // API Routes (auth route protected by auth limiter against brute force attempts)
-app.use('/api/auth', authLimiter, authRoutes);
+app.use('/api/auth', authRoutes);
 app.use('/api/links', linkRoutes);
 app.use('/api/qr', qrRoutes);
 app.use('/api/analytics', analyticsRoutes);

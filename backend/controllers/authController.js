@@ -15,7 +15,7 @@ export const signup = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    if (!name || !email || !password) {
+    if (!name || !email || typeof email !== 'string' || !password || typeof password !== 'string') {
       return res.status(400).json({ error: 'Please provide name, email, and password.' });
     }
 
@@ -28,40 +28,40 @@ export const signup = async (req, res) => {
 
     const existingUser = await User.findOne({ email: email.toLowerCase() });
     if (existingUser) {
-      return res.status(400).json({ error: 'User already exists with this email address.' });
+      return res.status(400).json({ error: 'Email already registered. Please log in.' });
     }
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const user = await User.create({
+    const newUser = await User.create({
       name,
       email: email.toLowerCase(),
       password: hashedPassword,
       authProvider: 'local',
       plan: 'free',
-      avatarUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=0D8BFF&color=fff`
+      avatarUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=FF6206&color=fff`
     });
 
-    const token = generateToken(user._id);
+    const token = generateToken(newUser._id);
 
     res.status(201).json({
       token,
       user: {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        authProvider: user.authProvider,
-        avatarUrl: user.avatarUrl,
-        plan: user.plan,
-        monthlyLinkCount: user.monthlyLinkCount,
-        monthlyQrCodeCount: user.monthlyQrCodeCount,
-        monthlyCustomBackHalfCount: user.monthlyCustomBackHalfCount
+        _id: newUser._id,
+        name: newUser.name,
+        email: newUser.email,
+        authProvider: newUser.authProvider,
+        avatarUrl: newUser.avatarUrl,
+        plan: newUser.plan,
+        monthlyLinkCount: newUser.monthlyLinkCount,
+        monthlyQrCodeCount: newUser.monthlyQrCodeCount,
+        monthlyCustomBackHalfCount: newUser.monthlyCustomBackHalfCount
       }
     });
-  } catch (error) {
-    console.error('Signup error:', error);
-    res.status(500).json({ error: 'Server error during registration.' });
+  } catch (err) {
+    console.error('Signup error:', err);
+    res.status(500).json({ error: 'Server error during signup.' });
   }
 };
 
@@ -72,7 +72,7 @@ export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    if (!email || !password) {
+    if (!email || typeof email !== 'string' || !password || typeof password !== 'string') {
       return res.status(400).json({ error: 'Please provide email and password.' });
     }
 

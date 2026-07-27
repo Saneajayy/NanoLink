@@ -33,6 +33,7 @@ const EditLinkModal = ({ isOpen, onClose, link, onSuccess }) => {
         title: title.trim(),
         originalUrl: originalUrl.trim(),
       });
+      window.dispatchEvent(new Event('nanolink_data_change'));
       if (onSuccess) onSuccess(res.data);
       onClose();
     } catch (err) {
@@ -43,54 +44,52 @@ const EditLinkModal = ({ isOpen, onClose, link, onSuccess }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-150 overflow-y-auto">
-      <div className="relative w-full max-w-lg bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden my-8">
-        <div className="h-1.5 w-full bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600" />
-
-        <div className="p-6 border-b border-slate-800 flex items-center justify-between">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-150 overflow-y-auto">
+      <div className="relative w-full max-w-lg bg-white border border-neutral-200 overflow-hidden my-8 shadow-xl rounded-md">
+        <div className="p-6 border-b border-neutral-200 flex items-center justify-between bg-white">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center">
+            <div className="w-10 h-10 bg-[#1A00FF]/10 text-[#1A00FF] flex items-center justify-center rounded-full shrink-0">
               <Edit3 className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-white">Edit Short Link</h2>
-              <p className="text-xs text-slate-400">Update destination URL and display title.</p>
+              <h2 className="text-lg font-bold text-black">Edit Short Link</h2>
+              <p className="text-xs text-neutral-600 font-light">Update destination URL and display title.</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+            className="p-2 text-neutral-400 hover:text-black hover:bg-neutral-100 rounded-sm transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-5">
+        <form onSubmit={handleSubmit} className="p-6 space-y-5 bg-white font-light">
           {error && (
-            <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-xl flex items-start gap-3 text-red-300 text-sm">
-              <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
-              <span>{error}</span>
+            <div className="p-4 bg-red-50 border border-red-200 flex items-start gap-3 text-red-600 text-xs rounded-sm">
+              <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
+              <span className="font-medium">{error}</span>
             </div>
           )}
 
           {/* Read-Only Short Link Slug per Section 5 */}
-          <div className="p-4 bg-slate-950 border border-slate-800/80 rounded-xl space-y-1.5">
+          <div className="p-4 bg-neutral-50 border border-neutral-200 rounded-sm space-y-1.5">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Short Link (Read-Only)</label>
-              <span className="flex items-center gap-1 text-[11px] text-amber-400 font-medium">
+              <label className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">Short Link (Read-Only)</label>
+              <span className="flex items-center gap-1 text-[11px] text-[#FF6206] font-medium">
                 <Lock className="w-3 h-3" />
                 <span>Alias permanent</span>
               </span>
             </div>
-            <div className="font-mono text-sm text-indigo-400 select-all truncate">{link.shortUrl}</div>
-            <p className="text-[11px] text-slate-500">
+            <div className="font-mono text-sm font-semibold text-black select-all truncate">{link.shortUrl}</div>
+            <p className="text-[11px] text-neutral-600 font-light">
               Per system policy (Section 5), back-half slugs cannot be modified after creation to prevent broken redirects.
             </p>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
-              Destination URL <span className="text-red-400">*</span>
+            <label className="block text-xs font-semibold text-black uppercase tracking-wider mb-2">
+              Destination URL <span className="text-[#FF6206]">*</span>
             </label>
             <input
               type="text"
@@ -98,12 +97,12 @@ const EditLinkModal = ({ isOpen, onClose, link, onSuccess }) => {
               value={originalUrl}
               onChange={(e) => setOriginalUrl(e.target.value)}
               placeholder="https://example.com/new-destination"
-              className="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+              className="w-full px-4 py-3 bg-white border border-neutral-300 text-black placeholder-neutral-400 text-sm font-normal focus:outline-none focus:border-black rounded-sm transition-all"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
+            <label className="block text-xs font-semibold text-black uppercase tracking-wider mb-2">
               Link Title (Optional)
             </label>
             <input
@@ -111,26 +110,26 @@ const EditLinkModal = ({ isOpen, onClose, link, onSuccess }) => {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. Spring Sale Page"
-              className="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+              className="w-full px-4 py-3 bg-white border border-neutral-300 text-black placeholder-neutral-400 text-sm font-normal focus:outline-none focus:border-black rounded-sm transition-all"
             />
           </div>
 
-          <div className="pt-4 border-t border-slate-800 flex justify-end gap-3">
+          <div className="pt-2 flex justify-end gap-3">
             <button
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-xl text-sm transition-colors"
+              className="px-5 py-2.5 bg-[#1A00FF] hover:bg-[#1A00FF]/90 text-white font-medium rounded-sm text-xs transition-colors cursor-pointer shadow-sm"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow-lg shadow-indigo-600/25 flex items-center gap-2 text-sm disabled:opacity-70"
+              className="px-6 py-2.5 bg-[#FF6206] hover:bg-[#FF6206]/90 text-white font-medium rounded-sm flex items-center gap-2 text-xs disabled:opacity-70 transition-all cursor-pointer shadow-sm"
             >
               {loading ? (
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-white border-t-transparent animate-spin rounded-full" />
               ) : (
                 <>
                   <Sparkles className="w-4 h-4" />

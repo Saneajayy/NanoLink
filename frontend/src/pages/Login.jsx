@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { ArrowRight, AlertCircle } from 'lucide-react';
+import { ArrowRight, AlertCircle, Eye, EyeOff } from 'lucide-react';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [localError, setLocalError] = useState('');
 
@@ -40,47 +41,41 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col justify-center items-center p-4 relative overflow-hidden">
-      {/* Background glowing effects */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
-
+    <div className="min-h-screen bg-neutral-50 flex flex-col justify-center items-center p-4 relative overflow-hidden font-light">
       {/* Brand logo */}
       <Link to="/" className="flex items-center gap-2 mb-8 z-10 hover:opacity-90 transition-opacity">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-orange-500 flex items-center justify-center font-bold text-white text-xl shadow-lg shadow-indigo-500/30">
+        <div className="w-9 h-9 bg-[#FF6206] flex items-center justify-center font-bold text-white text-lg rounded-sm shadow-sm">
           N
         </div>
-        <span className="font-bold text-2xl tracking-tight text-white">
-          Nano<span className="text-orange-500">Link</span>
+        <span className="font-bold text-2xl tracking-tight text-black">
+          Nano<span className="text-[#FF6206]">Link</span>
         </span>
       </Link>
 
       {/* Toggle link above the form per Section 4 */}
-      <div className="mb-4 text-slate-400 text-sm z-10">
+      <div className="mb-4 text-neutral-600 font-normal text-sm z-10">
         Don't have an account?{' '}
-        <Link to="/signup" className="text-orange-400 hover:text-orange-300 font-semibold underline underline-offset-4 transition-colors">
+        <Link to="/signup" className="text-[#FF6206] hover:underline font-semibold transition-colors">
           Sign up
         </Link>
       </div>
 
       {/* Centered card layout with white background and orange top accent bar per Section 4 */}
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden z-10 border border-slate-100">
-        <div className="h-2 w-full bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600" />
-        
-        <div className="p-8">
-          <h1 className="text-2xl font-bold text-slate-900 mb-2">Welcome back</h1>
-          <p className="text-slate-600 text-sm mb-6">Log in to manage your short links and QR codes.</p>
+      <div className="w-full max-w-md bg-white border border-neutral-200 overflow-hidden z-10 rounded-md shadow-xl">
+        <div className="p-8 bg-white">
+          <h1 className="text-2xl font-bold text-black mb-1">Welcome back</h1>
+          <p className="text-neutral-500 font-light text-sm mb-6">Log in to manage your short links and QR codes.</p>
 
           {localError && (
-            <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-r-lg flex items-start gap-3 text-red-700 text-sm animate-shake">
-              <AlertCircle className="w-5 h-5 shrink-0 mt-0.5 text-red-500" />
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 flex items-start gap-3 text-red-600 font-medium text-xs rounded-sm">
+              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-600" />
               <span>{localError}</span>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+              <label className="block text-xs font-semibold text-black uppercase tracking-wider mb-1.5">
                 Email Address
               </label>
               <input
@@ -89,37 +84,47 @@ const Login = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@example.com"
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-slate-900 placeholder-slate-400 transition-all text-sm"
+                className="w-full px-4 py-3 bg-white border border-neutral-300 rounded-sm focus:outline-none focus:border-black text-black placeholder-neutral-400 font-normal transition-all text-sm"
               />
             </div>
 
             <div>
-              <div className="flex items-center justify-between mb-1">
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-xs font-semibold text-black uppercase tracking-wider">
                   Password
                 </label>
                 {/* "Forgot your password?" link under/next to password field on Login only per Section 4 */}
-                <a href="#forgot" onClick={(e) => { e.preventDefault(); alert('Password reset is sent to your email.'); }} className="text-xs text-indigo-600 hover:text-indigo-800 font-medium transition-colors">
+                <a href="#forgot" onClick={(e) => { e.preventDefault(); alert('Password reset is sent to your email.'); }} className="text-xs text-[#FF6206] hover:underline font-medium transition-colors">
                   Forgot your password?
                 </a>
               </div>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-slate-900 placeholder-slate-400 transition-all text-sm"
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full px-4 py-3 pr-11 bg-white border border-neutral-300 rounded-sm focus:outline-none focus:border-black text-black placeholder-neutral-400 font-normal transition-all text-sm"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-black transition-colors p-1 cursor-pointer"
+                  title={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 px-4 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-semibold rounded-xl shadow-lg shadow-indigo-600/25 hover:shadow-indigo-600/40 transition-all flex items-center justify-center gap-2 text-sm disabled:opacity-70 disabled:cursor-not-allowed mt-2"
+              className="w-full py-3 px-4 bg-[#FF6206] hover:bg-[#FF6206]/90 text-white font-medium rounded-sm transition-all flex items-center justify-center gap-2 text-sm disabled:opacity-70 disabled:cursor-not-allowed mt-2 cursor-pointer shadow-sm"
             >
               {loading ? (
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-white border-t-transparent animate-spin rounded-full" />
               ) : (
                 <>
                   <span>Log in</span>
@@ -131,10 +136,10 @@ const Login = () => {
 
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-slate-200" />
+              <div className="w-full border-t border-neutral-200" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-3 text-slate-400 font-medium">Or continue with</span>
+              <span className="bg-white px-3 text-neutral-400 font-medium">Or continue with</span>
             </div>
           </div>
 
@@ -142,7 +147,7 @@ const Login = () => {
           <button
             type="button"
             onClick={loginWithGoogle}
-            className="w-full py-3.5 px-4 bg-white hover:bg-slate-50 text-slate-700 font-semibold rounded-xl border border-slate-200 shadow-sm hover:shadow transition-all flex items-center justify-center gap-3 text-sm"
+            className="w-full py-3 px-4 bg-white hover:bg-neutral-50 text-black font-medium border border-neutral-300 rounded-sm transition-all flex items-center justify-center gap-3 text-sm cursor-pointer shadow-sm"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -155,12 +160,12 @@ const Login = () => {
         </div>
 
         {/* Legal footer text per Section 4 */}
-        <div className="bg-slate-50 px-8 py-4 border-t border-slate-100 text-center">
-          <p className="text-[11px] text-slate-500 leading-relaxed">
+        <div className="bg-neutral-50 px-8 py-4 border-t border-neutral-200 text-center">
+          <p className="text-[11px] text-neutral-500 font-light leading-relaxed">
             By creating an account, you agree to NanoLink's{' '}
-            <a href="#terms" onClick={(e) => { e.preventDefault(); alert('Terms of Service'); }} className="text-slate-700 underline font-medium hover:text-indigo-600">Terms of Service</a>,{' '}
-            <a href="#privacy" onClick={(e) => { e.preventDefault(); alert('Privacy Policy'); }} className="text-slate-700 underline font-medium hover:text-indigo-600">Privacy Policy</a> and{' '}
-            <a href="#aup" onClick={(e) => { e.preventDefault(); alert('Acceptable Use Policy'); }} className="text-slate-700 underline font-medium hover:text-indigo-600">Acceptable Use Policy</a>.
+            <a href="#terms" onClick={(e) => { e.preventDefault(); alert('Terms of Service'); }} className="text-[#FF6206] underline font-medium hover:text-black">Terms of Service</a>,{' '}
+            <a href="#privacy" onClick={(e) => { e.preventDefault(); alert('Privacy Policy'); }} className="text-[#FF6206] underline font-medium hover:text-black">Privacy Policy</a> and{' '}
+            <a href="#aup" onClick={(e) => { e.preventDefault(); alert('Acceptable Use Policy'); }} className="text-[#FF6206] underline font-medium hover:text-black">Acceptable Use Policy</a>.
           </p>
         </div>
       </div>

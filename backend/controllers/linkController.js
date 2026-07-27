@@ -283,6 +283,10 @@ export const deleteLink = async (req, res) => {
     // Remove from Redis cache so public redirect immediately stops resolving per Section 8
     await cacheService.removeCachedRedirect(link.slug);
 
+    if (link.qrCodeId) {
+      await QrCode.deleteOne({ _id: link.qrCodeId });
+    }
+
     res.json({ message: 'Link deleted successfully.', id: link._id });
   } catch (error) {
     console.error('Delete link error:', error);

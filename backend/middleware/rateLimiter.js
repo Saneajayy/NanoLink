@@ -1,33 +1,35 @@
 import rateLimit from 'express-rate-limit';
 
+const isDev = process.env.NODE_ENV !== 'production';
+
 // Helper for standard 429 JSON error response
 const createLimiterResponse = (message) => ({
   error: 'RATE_LIMIT_EXCEEDED',
   message: message || 'Too many requests from this IP. Please try again later.'
 });
 
-// 1. General API Rate Limiter (100 requests per 15 minutes per IP)
+// 1. General API Rate Limiter (150 requests per 15 minutes per IP in prod; 2000 in dev)
 export const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 150, // Limit each IP to 150 requests per window
+  max: isDev ? 2000 : 150,
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
   message: createLimiterResponse('API request limit reached. Please wait a few minutes before retrying.')
 });
 
-// 2. Authentication Rate Limiter (20 requests per 15 minutes per IP per Section 8 security)
+// 2. Authentication Rate Limiter (20 requests per 15 minutes per IP in prod; 200 in dev per Section 8 security)
 export const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 20, // Limit each IP to 20 auth attempts (login, signup, password OTP) per window
+  max: isDev ? 200 : 20, // Limit each IP to auth attempts per window
   standardHeaders: true,
   legacyHeaders: false,
   message: createLimiterResponse('Too many authentication attempts from this IP. For security reasons, please try again after 15 minutes.')
 });
 
-// 3. Link Shortening Creation Limiter (50 links per 1 hour per IP)
+// 3. Link Shortening Creation Limiter (60 links per 1 hour per IP in prod; 500 in dev)
 export const linkCreationLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: 60, // Limit each IP to 60 link creation requests per hour
+  max: isDev ? 500 : 60, // Limit each IP to link creation requests per hour
   standardHeaders: true,
   legacyHeaders: false,
   message: createLimiterResponse('Hourly link creation limit reached. Please upgrade to Core for higher throughput or wait an hour.')

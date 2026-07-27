@@ -7,6 +7,18 @@ const qrCodeSchema = new mongoose.Schema({
     index: true,
     default: null
   },
+  destinationUrl: {
+    type: String,
+    default: null
+  },
+  title: {
+    type: String,
+    default: null
+  },
+  isDynamic: {
+    type: Boolean,
+    default: true
+  },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',

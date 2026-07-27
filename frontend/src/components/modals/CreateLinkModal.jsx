@@ -12,9 +12,12 @@ import {
   Copy, 
   ExternalLink,
   ChevronRight,
-  Sliders
+  Sliders,
+  Download,
+  Share2
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import StyledQRCode from '../common/StyledQRCode';
 
 const CreateLinkModal = ({ isOpen, onClose, initialUrl = '', onSuccess }) => {
   const { user, isCorePlan } = useAuth();
@@ -73,12 +76,11 @@ const CreateLinkModal = ({ isOpen, onClose, initialUrl = '', onSuccess }) => {
 
   // Quota computations
   const customBackHalvesUsed = user?.monthlyCustomBackHalfCount || 0;
-  const customBackHalvesLimit = isCorePlan ? '∞' : 3;
-  const backHalvesRemaining = isCorePlan ? 'Unlimited' : Math.max(0, 3 - customBackHalvesUsed);
-  const isBackHalfDisabled = !isCorePlan && customBackHalvesUsed >= 3;
+  const backHalvesRemaining = isCorePlan ? 'Unlimited' : Math.max(0, 5 - customBackHalvesUsed);
+  const isBackHalfDisabled = !isCorePlan && customBackHalvesUsed >= 5;
 
   const qrCodesUsed = user?.monthlyQrCodeCount || 0;
-  const qrCodesLimit = isCorePlan ? 5 : 2;
+  const qrCodesLimit = isCorePlan ? 50 : 10;
   const qrCodesRemaining = Math.max(0, qrCodesLimit - qrCodesUsed);
   const isQrDisabled = qrCodesRemaining <= 0;
 
@@ -122,6 +124,7 @@ const CreateLinkModal = ({ isOpen, onClose, initialUrl = '', onSuccess }) => {
 
       const res = await axios.post('/api/links', payload);
       setCreatedResult(res.data);
+      window.dispatchEvent(new Event('nanolink_data_change'));
       if (onSuccess) onSuccess(res.data);
     } catch (err) {
       const errData = err.response?.data;
@@ -142,26 +145,86 @@ const CreateLinkModal = ({ isOpen, onClose, initialUrl = '', onSuccess }) => {
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-150 overflow-y-auto">
-      <div className="relative w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden my-8">
-        {/* Top orange gradient bar */}
-        <div className="h-1.5 w-full bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600" />
+  const handleShare = async () => {
+    if (navigator.share && createdResult?.link?.shortUrl) {
+      try {
+        await navigator.share({
+          title: createdResult.link.title || 'NanoLink Short URL',
+          text: 'Check out this short link!',
+          url: createdResult.link.shortUrl
+        });
+      } catch (err) {}
+    } else {
+      handleCopy();
+    }
+  };
 
+  const handleDownloadPng = () => {
+    const svgEl = document.querySelector('#link-modal-qr-svg svg') || document.getElementById('link-modal-qr-svg');
+    if (svgEl) {
+      const serializer = new XMLSerializer();
+      const source = serializer.serializeToString(svgEl);
+      const url = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(source);
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 1200;
+        canvas.height = 1200;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, 1200, 1200);
+        const pngUrl = canvas.toDataURL('image/png');
+        const link = document.createElement('a');
+        link.href = pngUrl;
+        link.download = `nanolink-${createdResult?.link?.slug || 'link'}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      };
+      img.src = url;
+    } else if (createdResult?.qrCode?.imageUrl) {
+      const link = document.createElement('a');
+      link.href = createdResult.qrCode.imageUrl;
+      link.download = `nanolink-${createdResult?.link?.slug || 'link'}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
+  const handleDownloadSvg = () => {
+    const svgEl = document.querySelector('#link-modal-qr-svg svg') || document.getElementById('link-modal-qr-svg');
+    if (svgEl) {
+      const serializer = new XMLSerializer();
+      const source = serializer.serializeToString(svgEl);
+      const url = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(source);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `nanolink-${createdResult?.link?.slug || 'link'}.svg`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-150 overflow-y-auto">
+      <div className="relative w-full max-w-2xl bg-white border border-neutral-200 overflow-hidden my-8 shadow-xl rounded-md">
         {/* Modal Header */}
-        <div className="p-6 border-b border-slate-800 flex items-center justify-between">
+        <div className="p-6 border-b border-neutral-200 flex items-center justify-between bg-white">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center">
+            <div className="w-10 h-10 bg-[#FF6206]/10 text-[#FF6206] flex items-center justify-center rounded-full shrink-0">
               <Link2 className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-white">Create New Short Link</h2>
-              <p className="text-xs text-slate-400">Transform long URLs into powerful, trackable short links.</p>
+              <h2 className="text-lg font-bold text-black">Create New Short Link</h2>
+              <p className="text-xs text-neutral-600 font-light">Transform long URLs into powerful, trackable short links.</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+            className="p-2 text-neutral-400 hover:text-black hover:bg-neutral-100 rounded-sm transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -169,43 +232,86 @@ const CreateLinkModal = ({ isOpen, onClose, initialUrl = '', onSuccess }) => {
 
         {createdResult ? (
           /* Success View */
-          <div className="p-8 text-center space-y-6 animate-in zoom-in-95 duration-200">
-            <div className="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mx-auto shadow-lg shadow-emerald-500/20">
+          <div className="p-8 text-center space-y-6 animate-in zoom-in-95 duration-200 bg-white font-light">
+            <div className="w-16 h-16 bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto rounded-full border border-emerald-200">
               <CheckCircle2 className="w-8 h-8" />
             </div>
             <div>
-              <h3 className="text-2xl font-bold text-white mb-2">Your Link is Ready!</h3>
-              <p className="text-sm text-slate-400 truncate max-w-md mx-auto">{createdResult.link.originalUrl}</p>
+              <h3 className="text-2xl font-bold text-black mb-1">Short Link Generated Successfully!</h3>
+              <a href={createdResult.link.originalUrl} target="_blank" rel="noreferrer" className="text-sm text-[#1A00FF] hover:underline truncate max-w-md mx-auto font-light font-mono block">{createdResult.link.originalUrl}</a>
             </div>
 
-            <div className="p-4 bg-slate-950 border border-slate-800 rounded-xl flex items-center justify-between gap-4">
-              <span className="text-lg font-mono font-bold text-indigo-400 truncate">{createdResult.link.shortUrl}</span>
+            <div className="p-4 bg-neutral-50 border border-neutral-200 rounded-sm flex items-center justify-between gap-4 max-w-md mx-auto shadow-sm">
+              <a href={createdResult.link.shortUrl} target="_blank" rel="noreferrer" className="text-base font-mono font-medium text-[#1A00FF] hover:underline truncate">{createdResult.link.shortUrl}</a>
               <button
                 onClick={handleCopy}
-                className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg flex items-center gap-2 shadow transition-all shrink-0"
+                className="px-4 py-2 bg-[#FF6206] hover:bg-[#FF6206]/90 text-white text-xs font-medium flex items-center gap-1.5 rounded-sm transition-all shrink-0 cursor-pointer shadow-sm"
               >
-                <Copy className="w-4 h-4" />
+                <Copy className="w-3.5 h-3.5" />
                 <span>{copied ? 'Copied!' : 'Copy Link'}</span>
               </button>
             </div>
 
+            {/* Always show QR preview so they can download or scan */}
             {createdResult.qrCode && (
-              <div className="p-4 bg-slate-950 border border-slate-800 rounded-xl inline-block text-center">
-                <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Generated QR Code</div>
-                <img src={createdResult.qrCode.imageUrl} alt="QR Code" className="w-40 h-40 mx-auto rounded-lg bg-white p-2" />
+              <div className="p-4 bg-white border border-neutral-200 rounded-sm inline-block text-center shadow-sm">
+                <div className="text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-3">Associated QR Code</div>
+                <div className="mx-auto bg-white p-2 inline-block">
+                  <StyledQRCode
+                    id="link-modal-qr-svg"
+                    value={createdResult.link.shortUrl}
+                    size={160}
+                    fgColor={createdResult.qrCode?.color || '#000000'}
+                    pattern={createdResult.qrCode?.pattern || 'squares'}
+                    cornerStyle={createdResult.qrCode?.cornerStyle || 'square'}
+                    frame={createdResult.qrCode?.frame || 'none'}
+                  />
+                </div>
               </div>
             )}
 
-            <div className="pt-4 flex justify-end gap-3 border-t border-slate-800">
+            <div className="flex flex-wrap justify-center gap-3 pt-4 border-t border-neutral-200">
+              <button
+                onClick={handleCopy}
+                className="px-5 py-2.5 bg-[#1A00FF] hover:bg-[#1A00FF]/90 text-white text-xs font-medium flex items-center gap-2 rounded-sm transition-all cursor-pointer shadow-sm"
+              >
+                <Copy className="w-4 h-4" />
+                <span>{copied ? 'Copied!' : 'Copy Link'}</span>
+              </button>
+              <button
+                onClick={handleShare}
+                className="px-5 py-2.5 bg-[#1A00FF] hover:bg-[#1A00FF]/90 text-white text-xs font-medium flex items-center gap-2 rounded-sm transition-colors cursor-pointer shadow-sm"
+              >
+                <Share2 className="w-4 h-4" />
+                <span>Share</span>
+              </button>
+              {createdResult.qrCode && (
+                <>
+                  <button
+                    onClick={handleDownloadPng}
+                    className="px-5 py-2.5 bg-[#FF6206] hover:bg-[#FF6206]/90 text-white text-xs font-medium flex items-center gap-2 rounded-sm transition-all cursor-pointer shadow-sm"
+                  >
+                    <Download className="w-4 h-4" />
+                    <span>Download PNG</span>
+                  </button>
+                  <button
+                    onClick={handleDownloadSvg}
+                    className="px-5 py-2.5 bg-[#1A00FF] hover:bg-[#1A00FF]/90 text-white text-xs font-medium flex items-center gap-2 rounded-sm transition-colors cursor-pointer shadow-sm"
+                  >
+                    <Download className="w-4 h-4" />
+                    <span>Download SVG</span>
+                  </button>
+                </>
+              )}
               <button
                 onClick={() => setCreatedResult(null)}
-                className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-semibold rounded-xl transition-colors"
+                className="px-5 py-2.5 bg-[#FF6206] hover:bg-[#FF6206]/90 text-white text-xs font-medium rounded-sm transition-colors cursor-pointer shadow-sm"
               >
                 Create Another
               </button>
               <button
                 onClick={onClose}
-                className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl shadow-lg shadow-indigo-600/30 transition-all"
+                className="px-5 py-2.5 bg-[#1A00FF] hover:bg-[#1A00FF]/90 text-white text-xs font-medium rounded-sm transition-colors cursor-pointer shadow-sm"
               >
                 Done
               </button>
@@ -213,18 +319,18 @@ const CreateLinkModal = ({ isOpen, onClose, initialUrl = '', onSuccess }) => {
           </div>
         ) : (
           /* Form View */
-          <form onSubmit={handleSubmit} className="p-6 space-y-6 max-h-[75vh] overflow-y-auto">
+          <form onSubmit={handleSubmit} className="p-6 space-y-6 max-h-[75vh] overflow-y-auto bg-white font-light">
             {error && (
-              <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-xl flex items-start gap-3 text-red-300 text-sm">
-                <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+              <div className="p-4 bg-red-50 border border-red-200 flex items-start gap-3 text-red-600 text-xs rounded-sm">
+                <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
                 <div className="flex-1">
-                  <div className="font-semibold">{isQuotaError ? 'Plan Limit Reached' : 'Error'}</div>
-                  <div className="text-red-200 mt-0.5">{error}</div>
+                  <div className="font-semibold text-red-700">{isQuotaError ? 'Plan Limit Reached' : 'Error'}</div>
+                  <div className="text-neutral-700 font-normal mt-0.5">{error}</div>
                   {isQuotaError && (
                     <button
                       type="button"
                       onClick={() => { onClose(); navigate('/dashboard/billing'); }}
-                      className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-bold text-xs rounded-lg shadow hover:opacity-95 transition-opacity"
+                      className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#FF6206] text-white font-medium text-xs rounded-sm shadow-sm cursor-pointer"
                     >
                       <Crown className="w-3.5 h-3.5" />
                       <span>Upgrade to Core Now</span>
@@ -236,8 +342,8 @@ const CreateLinkModal = ({ isOpen, onClose, initialUrl = '', onSuccess }) => {
 
             {/* Destination URL (Required) */}
             <div>
-              <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
-                Destination URL <span className="text-red-400">*</span>
+              <label className="block text-xs font-semibold text-black uppercase tracking-wider mb-2">
+                Destination URL <span className="text-[#FF6206]">*</span>
               </label>
               <input
                 type="text"
@@ -245,23 +351,23 @@ const CreateLinkModal = ({ isOpen, onClose, initialUrl = '', onSuccess }) => {
                 value={originalUrl}
                 onChange={(e) => setOriginalUrl(e.target.value)}
                 placeholder="https://example.com/long-campaign-url"
-                className="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 bg-white border border-neutral-300 text-black placeholder-neutral-400 text-sm font-normal focus:outline-none focus:border-black rounded-sm transition-all"
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-6">
               {/* Short Link Domain (Fixed text nano.link per Section 6.6) & Back-Half Field */}
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider">
+                  <label className="block text-xs font-semibold text-black uppercase tracking-wider">
                     Custom Back-Half (Optional)
                   </label>
-                  <span className="text-[11px] text-slate-400 font-medium">
+                  <span className="text-[11px] text-neutral-500 font-medium">
                     {backHalvesRemaining} left this month
                   </span>
                 </div>
-                <div className="flex items-center">
-                  <div className="px-3 py-3 bg-slate-950 border border-r-0 border-slate-800 rounded-l-xl text-slate-400 text-sm font-mono select-none">
+                <div className="flex items-center w-full">
+                  <div className="px-3 py-3 bg-neutral-100 border border-r-0 border-black text-neutral-700 text-sm font-mono font-medium select-none rounded-l-sm shrink-0">
                     nano.link/r/
                   </div>
                   <input
@@ -270,11 +376,11 @@ const CreateLinkModal = ({ isOpen, onClose, initialUrl = '', onSuccess }) => {
                     value={backHalf}
                     onChange={(e) => setBackHalf(e.target.value)}
                     placeholder="my-alias"
-                    className="flex-1 px-3 py-3 bg-slate-950 border border-slate-800 rounded-r-xl text-white placeholder-slate-600 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                    className="flex-1 min-w-0 w-full px-3 py-3 bg-white border border-black text-black placeholder-neutral-400 text-sm font-mono font-normal focus:outline-none focus:ring-1 focus:ring-black rounded-r-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                   />
                 </div>
                 {isBackHalfDisabled && (
-                  <p className="mt-1.5 text-[11px] text-amber-400 flex items-center gap-1">
+                  <p className="mt-1.5 text-[11px] text-[#FF6206] font-medium flex items-center gap-1">
                     <Crown className="w-3 h-3" />
                     <span>Free limit reached. Upgrade to Core for unlimited aliases.</span>
                   </p>
@@ -283,7 +389,7 @@ const CreateLinkModal = ({ isOpen, onClose, initialUrl = '', onSuccess }) => {
 
               {/* Title Field (Optional) */}
               <div>
-                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
+                <label className="block text-xs font-semibold text-black uppercase tracking-wider mb-2">
                   Link Title (Optional)
                 </label>
                 <input
@@ -291,25 +397,25 @@ const CreateLinkModal = ({ isOpen, onClose, initialUrl = '', onSuccess }) => {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="e.g. Summer Launch Campaign"
-                  className="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 bg-white border border-black text-black placeholder-neutral-400 text-sm font-normal focus:outline-none focus:border-black rounded-sm transition-all"
                 />
               </div>
             </div>
 
             {/* Sharing Options Section: Generate QR Code Toggle (Section 6.6) */}
-            <div className="p-4 bg-slate-950/60 border border-slate-800/80 rounded-xl space-y-4">
+            <div className="p-4 bg-neutral-50 border border-black rounded-sm space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-orange-500/10 text-orange-400 flex items-center justify-center">
+                  <div className="w-8 h-8 bg-[#FF6206]/10 text-[#FF6206] border border-black rounded-sm flex items-center justify-center">
                     <QrCode className="w-4 h-4" />
                   </div>
                   <div>
-                    <div className="text-sm font-bold text-white">Generate a QR Code</div>
-                    <div className="text-xs text-slate-400">Instantly create a printable, scan-ready QR code for this link.</div>
+                    <div className="text-sm font-bold text-black">Generate a QR Code</div>
+                    <div className="text-xs text-neutral-600 font-light">Instantly create a printable, scan-ready QR code for this link.</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="text-[11px] text-slate-400 font-medium">
+                  <span className="text-[11px] text-neutral-500 font-medium">
                     {qrCodesRemaining} left this month
                   </span>
                   <label className="relative inline-flex items-center cursor-pointer">
@@ -320,25 +426,25 @@ const CreateLinkModal = ({ isOpen, onClose, initialUrl = '', onSuccess }) => {
                       onChange={(e) => setGenerateQr(e.target.checked)}
                       className="sr-only peer"
                     />
-                    <div className="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500 disabled:opacity-50" />
+                    <div className="w-11 h-6 bg-neutral-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-neutral-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF6206] disabled:opacity-50" />
                   </label>
                 </div>
               </div>
 
               {/* QR Styling Controls (Section 6.6: Color always; Pattern/Corner/Frame only if Core plan!) */}
               {generateQr && (
-                <div className="pt-4 border-t border-slate-800/80 space-y-4 animate-in fade-in duration-200">
+                <div className="pt-4 border-t border-neutral-200 space-y-4 animate-in fade-in duration-200">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-400 mb-1.5">QR Code Color</label>
+                    <label className="block text-xs font-semibold text-black mb-1.5">QR Code Color</label>
                     <div className="flex items-center gap-3">
-                      {['#000000', '#0D8BFF', '#4F46E5', '#FF6B2C', '#10B981', '#EC4899'].map((col) => (
+                      {['#000000', '#1A00FF', '#FF6206', '#FFFFFF'].map((col) => (
                         <button
                           key={col}
                           type="button"
                           onClick={() => setQrColor(col)}
                           style={{ backgroundColor: col }}
-                          className={`w-7 h-7 rounded-full border-2 transition-transform ${
-                            qrColor === col ? 'border-white scale-110 shadow-lg' : 'border-transparent opacity-80 hover:opacity-100'
+                          className={`w-7 h-7 border rounded-sm transition-transform cursor-pointer ${
+                            qrColor === col ? 'border-black ring-2 ring-black scale-110' : 'border-neutral-300 opacity-80 hover:opacity-100'
                           }`}
                         />
                       ))}
@@ -349,11 +455,11 @@ const CreateLinkModal = ({ isOpen, onClose, initialUrl = '', onSuccess }) => {
                   {isCorePlan ? (
                     <div className="grid grid-cols-3 gap-3 pt-2">
                       <div>
-                        <label className="block text-xs font-semibold text-slate-400 mb-1">Pattern</label>
+                        <label className="block text-xs font-semibold text-black mb-1">Pattern</label>
                         <select
                           value={qrPattern}
                           onChange={(e) => setQrPattern(e.target.value)}
-                          className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white"
+                          className="w-full bg-white border border-neutral-300 rounded-sm px-2.5 py-1.5 text-xs text-black font-medium focus:border-black"
                         >
                           <option value="squares">Squares (Standard)</option>
                           <option value="dots">Dots (Modern)</option>
@@ -361,11 +467,11 @@ const CreateLinkModal = ({ isOpen, onClose, initialUrl = '', onSuccess }) => {
                         </select>
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-slate-400 mb-1">Corner Style</label>
+                        <label className="block text-xs font-semibold text-black mb-1">Corner Style</label>
                         <select
                           value={qrCornerStyle}
                           onChange={(e) => setQrCornerStyle(e.target.value)}
-                          className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white"
+                          className="w-full bg-white border border-neutral-300 rounded-sm px-2.5 py-1.5 text-xs text-black font-medium focus:border-black"
                         >
                           <option value="square">Square</option>
                           <option value="extra-rounded">Extra Rounded</option>
@@ -373,11 +479,11 @@ const CreateLinkModal = ({ isOpen, onClose, initialUrl = '', onSuccess }) => {
                         </select>
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-slate-400 mb-1">Frame</label>
+                        <label className="block text-xs font-semibold text-black mb-1">Frame</label>
                         <select
                           value={qrFrame}
                           onChange={(e) => setQrFrame(e.target.value)}
-                          className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white"
+                          className="w-full bg-white border border-neutral-300 rounded-sm px-2.5 py-1.5 text-xs text-black font-medium focus:border-black"
                         >
                           <option value="none">None</option>
                           <option value="scan-me">Scan Me Banner</option>
@@ -386,15 +492,15 @@ const CreateLinkModal = ({ isOpen, onClose, initialUrl = '', onSuccess }) => {
                       </div>
                     </div>
                   ) : (
-                    <div className="p-3 bg-indigo-500/10 border border-indigo-500/20 rounded-lg flex items-center justify-between text-xs text-indigo-300">
+                    <div className="p-3 bg-neutral-100 border border-neutral-200 rounded-sm flex items-center justify-between text-xs text-black font-medium">
                       <div className="flex items-center gap-2">
-                        <Crown className="w-4 h-4 text-amber-400 shrink-0" />
+                        <Crown className="w-4 h-4 text-[#FF6206] shrink-0" />
                         <span>Upgrade to Core for custom patterns, corners, and frames!</span>
                       </div>
                       <Link
                         to="/dashboard/billing"
                         onClick={onClose}
-                        className="text-amber-400 font-bold hover:underline shrink-0"
+                        className="text-[#FF6206] font-semibold hover:underline shrink-0"
                       >
                         Upgrade
                       </Link>
@@ -405,38 +511,38 @@ const CreateLinkModal = ({ isOpen, onClose, initialUrl = '', onSuccess }) => {
             </div>
 
             {/* Advanced Settings: UTM Parameters Sub-Form (Core Gated per Section 6.6) */}
-            <div className="border border-slate-800 rounded-xl overflow-hidden">
+            <div className="border border-black rounded-sm overflow-hidden">
               <button
                 type="button"
                 onClick={() => setShowUtmSection(!showUtmSection)}
-                className="w-full p-4 bg-slate-950/60 hover:bg-slate-950 flex items-center justify-between transition-colors"
+                className="w-full p-4 bg-white hover:bg-neutral-50 flex items-center justify-between transition-colors cursor-pointer"
               >
                 <div className="flex items-center gap-2.5">
-                  <Sliders className="w-4 h-4 text-indigo-400" />
-                  <span className="text-sm font-bold text-white">Advanced Settings: UTM Builder</span>
+                  <Sliders className="w-4 h-4 text-[#FF6206]" />
+                  <span className="text-sm font-bold text-black">Advanced Settings: UTM Builder</span>
                   {!isCorePlan && (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-500/20 text-amber-400 text-[10px] font-bold rounded uppercase border border-amber-500/30">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-50 text-amber-700 text-[10px] font-semibold uppercase border border-amber-200 rounded-sm">
                       <Crown className="w-3 h-3" />
                       <span>Core Only</span>
                     </span>
                   )}
                 </div>
-                <ChevronRight className={`w-4 h-4 text-slate-400 transition-transform ${showUtmSection ? 'rotate-90' : ''}`} />
+                <ChevronRight className={`w-4 h-4 text-black transition-transform ${showUtmSection ? 'rotate-90' : ''}`} />
               </button>
 
               {showUtmSection && (
-                <div className="p-4 bg-slate-900 border-t border-slate-800 space-y-4 animate-in fade-in duration-150">
+                <div className="p-4 bg-white border-t border-neutral-200 space-y-4 animate-in fade-in duration-150">
                   {!isCorePlan ? (
-                    <div className="text-center py-6 px-4 bg-slate-950 rounded-xl border border-slate-800 space-y-3">
-                      <Crown className="w-8 h-8 text-amber-400 mx-auto" />
-                      <h4 className="text-base font-bold text-white">Unlock Campaign Analytics</h4>
-                      <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                    <div className="text-center py-6 px-4 bg-neutral-50 border border-neutral-200 rounded-sm space-y-3">
+                      <Crown className="w-8 h-8 text-[#FF6206] mx-auto" />
+                      <h4 className="text-base font-bold text-black">Unlock Campaign Analytics</h4>
+                      <p className="text-xs text-neutral-600 max-w-sm mx-auto font-light">
                         Bake UTM parameters directly into your links to track campaign performance across Google Analytics and marketing dashboards.
                       </p>
                       <Link
                         to="/dashboard/billing"
                         onClick={onClose}
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 text-xs font-bold rounded-lg shadow hover:opacity-95 transition-opacity"
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-[#FF6206] hover:bg-[#FF6206]/90 text-white text-xs font-medium rounded-sm shadow-sm transition-all"
                       >
                         <span>Upgrade to Core</span>
                         <ExternalLink className="w-3.5 h-3.5" />
@@ -445,53 +551,53 @@ const CreateLinkModal = ({ isOpen, onClose, initialUrl = '', onSuccess }) => {
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-[11px] font-bold text-slate-400 uppercase mb-1">UTM Source</label>
+                        <label className="block text-[11px] font-semibold text-black uppercase mb-1">UTM Source</label>
                         <input
                           type="text"
                           value={utmSource}
                           onChange={(e) => setUtmSource(e.target.value)}
                           placeholder="e.g. google, newsletter, twitter"
-                          className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white text-xs placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                          className="w-full px-3 py-2 bg-white border border-neutral-300 rounded-sm text-black text-xs placeholder-neutral-400 font-normal focus:border-black"
                         />
                       </div>
                       <div>
-                        <label className="block text-[11px] font-bold text-slate-400 uppercase mb-1">UTM Medium</label>
+                        <label className="block text-[11px] font-semibold text-black uppercase mb-1">UTM Medium</label>
                         <input
                           type="text"
                           value={utmMedium}
                           onChange={(e) => setUtmMedium(e.target.value)}
                           placeholder="e.g. cpc, banner, email"
-                          className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white text-xs placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                          className="w-full px-3 py-2 bg-white border border-neutral-300 rounded-sm text-black text-xs placeholder-neutral-400 font-normal focus:border-black"
                         />
                       </div>
                       <div>
-                        <label className="block text-[11px] font-bold text-slate-400 uppercase mb-1">UTM Campaign</label>
+                        <label className="block text-[11px] font-semibold text-black uppercase mb-1">UTM Campaign</label>
                         <input
                           type="text"
                           value={utmCampaign}
                           onChange={(e) => setUtmCampaign(e.target.value)}
                           placeholder="e.g. summer_sale, launch_2026"
-                          className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white text-xs placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                          className="w-full px-3 py-2 bg-white border border-neutral-300 rounded-sm text-black text-xs placeholder-neutral-400 font-normal focus:border-black"
                         />
                       </div>
                       <div>
-                        <label className="block text-[11px] font-bold text-slate-400 uppercase mb-1">UTM Term / Keyword</label>
+                        <label className="block text-[11px] font-semibold text-black uppercase mb-1">UTM Term / Keyword</label>
                         <input
                           type="text"
                           value={utmTerm}
                           onChange={(e) => setUtmTerm(e.target.value)}
                           placeholder="e.g. running+shoes"
-                          className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white text-xs placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                          className="w-full px-3 py-2 bg-white border border-neutral-300 rounded-sm text-black text-xs placeholder-neutral-400 font-normal focus:border-black"
                         />
                       </div>
                       <div className="md:col-span-2">
-                        <label className="block text-[11px] font-bold text-slate-400 uppercase mb-1">UTM Content</label>
+                        <label className="block text-[11px] font-semibold text-black uppercase mb-1">UTM Content</label>
                         <input
                           type="text"
                           value={utmContent}
                           onChange={(e) => setUtmContent(e.target.value)}
                           placeholder="e.g. logolink, textlink, header_cta"
-                          className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white text-xs placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                          className="w-full px-3 py-2 bg-white border border-neutral-300 rounded-sm text-black text-xs placeholder-neutral-400 font-normal focus:border-black"
                         />
                       </div>
                     </div>
@@ -501,22 +607,22 @@ const CreateLinkModal = ({ isOpen, onClose, initialUrl = '', onSuccess }) => {
             </div>
 
             {/* Footer Buttons (Cancel / Create your link per Section 6.6) */}
-            <div className="pt-4 border-t border-slate-800 flex items-center justify-end gap-3">
+            <div className="pt-4 border-t border-neutral-200 flex items-center justify-end gap-3 bg-white">
               <button
                 type="button"
                 onClick={onClose}
                 disabled={loading}
-                className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-xl text-sm transition-colors"
+                className="px-5 py-2.5 bg-[#1A00FF] hover:bg-[#1A00FF]/90 text-white font-medium rounded-sm text-xs transition-colors cursor-pointer shadow-sm"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-semibold rounded-xl shadow-lg shadow-indigo-600/25 hover:shadow-indigo-600/40 transition-all flex items-center gap-2 text-sm disabled:opacity-70"
+                className="px-6 py-2.5 bg-[#FF6206] hover:bg-[#FF6206]/90 active:bg-[#FF6206] text-white font-medium rounded-sm transition-all flex items-center gap-2 text-xs disabled:opacity-70 cursor-pointer shadow-sm"
               >
                 {loading ? (
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent animate-spin rounded-full" />
                 ) : (
                   <>
                     <Sparkles className="w-4 h-4" />

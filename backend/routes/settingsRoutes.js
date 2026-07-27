@@ -7,12 +7,13 @@ import {
   deleteAccount 
 } from '../controllers/settingsController.js';
 import { protect, optionalAuth } from '../middleware/auth.js';
+import { authLimiter } from '../middleware/rateLimiter.js';
 
 const router = express.Router();
 
 // Password verification endpoints (works for both authenticated Settings change and unauthenticated Forgot Password)
-router.post('/password/request-otp', optionalAuth, requestPasswordChangeOtp);
-router.post('/password/verify-and-change', optionalAuth, verifyAndChangePassword);
+router.post('/password/request-otp', authLimiter, optionalAuth, requestPasswordChangeOtp);
+router.post('/password/verify-and-change', authLimiter, optionalAuth, verifyAndChangePassword);
 
 // Protected routes (require valid JWT)
 router.use(protect);

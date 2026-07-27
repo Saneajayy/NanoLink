@@ -25,10 +25,14 @@ export const generateQrImage = async (url, options = {}) => {
 };
 
 export const createQrForLink = async (link, user, options = {}) => {
-  const imageUrl = await generateQrImage(link.shortUrl, options);
+  const targetUrl = link ? link.shortUrl : options.destinationUrl;
+  const imageUrl = await generateQrImage(targetUrl, options);
 
   const qrCode = await QrCodeModel.create({
-    linkId: link._id,
+    linkId: link ? link._id : null,
+    destinationUrl: link ? link.originalUrl : options.destinationUrl,
+    title: link ? (link.title || link.slug) : (options.title || `QR for ${options.destinationUrl.replace(/^https?:\/\//i, '').substring(0, 30)}`),
+    isDynamic: !!link,
     owner: user._id,
     imageUrl,
     color: options.color || '#000000',
@@ -37,9 +41,10 @@ export const createQrForLink = async (link, user, options = {}) => {
     frame: user.plan === 'core' ? options.frame || null : null,
   });
 
-  // Link the QrCode ID back to the link
-  link.qrCodeId = qrCode._id;
-  await link.save();
+  if (link) {
+    link.qrCodeId = qrCode._id;
+    await link.save();
+  }
 
   return qrCode;
 };
