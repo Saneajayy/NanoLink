@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { ArrowRight, AlertCircle, Eye, EyeOff } from 'lucide-react';
+import Logo from '../components/common/Logo';
 
 const Signup = () => {
     const [name, setName] = useState('');
@@ -30,8 +31,7 @@ const Signup = () => {
         try {
             await signup(name, email, password);
 
-            // Check if user had pasted a URL on the homepage before signing up (Section 4 critical flow)
-            const pendingUrl = getPendingUrl(false); // Don't clear yet, dashboard modal will read and clear
+            const pendingUrl = getPendingUrl(false);
             if (pendingUrl) {
                 navigate('/dashboard?action=create_link');
             } else {
@@ -45,33 +45,28 @@ const Signup = () => {
     };
 
     return (
-        <div className="min-h-screen bg-neutral-50 flex flex-col justify-center items-center p-4 relative overflow-hidden font-light">
+        <div className="min-h-screen bg-white flex flex-col justify-center items-center p-4 relative overflow-hidden font-light text-neutral-900">
             {/* Brand logo */}
-            <Link to="/" className="flex items-center gap-2 mb-8 z-10 hover:opacity-90 transition-opacity">
-                <div className="w-9 h-9 bg-[#FF6206] flex items-center justify-center font-bold text-white text-lg rounded-sm shadow-sm">
-                    N
-                </div>
-                <span className="font-bold text-2xl tracking-tight text-black">
-                    Nano<span className="text-[#FF6206]">Link</span>
-                </span>
+            <Link to="/" className="mb-8 z-10 hover:opacity-90 transition-opacity">
+                <Logo />
             </Link>
 
-            {/* Toggle link above the form per Section 4 */}
-            <div className="mb-4 text-neutral-600 font-normal text-sm z-10">
+            {/* Toggle link above the form */}
+            <div className="mb-4 text-neutral-500 font-normal text-sm z-10">
                 Already have an account?{' '}
-                <Link to="/login" className="text-[#FF6206] hover:underline font-semibold transition-colors">
+                <Link to="/login" className="text-green-700 hover:underline font-semibold transition-colors">
                     Log in
                 </Link>
             </div>
 
-            {/* Centered card layout with white background and orange top accent bar per Section 4 */}
-            <div className="w-full max-w-md bg-white border border-neutral-200 overflow-hidden z-10 rounded-md shadow-xl">
-                <div className="p-8 bg-white">
-                    <h1 className="text-2xl font-bold text-black mb-1">Create an account</h1>
+            {/* Centered card layout */}
+            <div className="w-full max-w-md bg-white border border-neutral-200 overflow-hidden z-10 rounded-xl">
+                <div className="p-8">
+                    <h1 className="text-2xl font-bold text-neutral-900 mb-1">Create an account</h1>
                     <p className="text-neutral-500 font-light text-sm mb-6">Start managing your short links and QR codes.</p>
 
                     {localError && (
-                        <div className="mb-6 p-4 bg-red-50 border border-red-200 flex items-start gap-3 text-red-600 font-medium text-xs rounded-sm">
+                        <div className="mb-6 p-4 bg-red-50 border border-red-200 flex items-start gap-3 text-red-700 font-medium text-xs rounded-lg">
                             <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-600" />
                             <span>{localError}</span>
                         </div>
@@ -79,7 +74,7 @@ const Signup = () => {
 
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div>
-                            <label className="block text-xs font-semibold text-black uppercase tracking-wider mb-1.5">
+                            <label className="block text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-1.5">
                                 Full Name
                             </label>
                             <input
@@ -88,12 +83,12 @@ const Signup = () => {
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
                                 placeholder="John Doe"
-                                className="w-full px-4 py-3 bg-white border border-neutral-300 rounded-sm focus:outline-none focus:border-black text-black placeholder-neutral-400 font-normal transition-all text-sm"
+                                className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-lg focus:outline-none focus:border-green-700 text-neutral-900 placeholder-neutral-400 font-normal transition-all text-sm"
                             />
                         </div>
 
                         <div>
-                            <label className="block text-xs font-semibold text-black uppercase tracking-wider mb-1.5">
+                            <label className="block text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-1.5">
                                 Email Address
                             </label>
                             <input
@@ -102,12 +97,12 @@ const Signup = () => {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 placeholder="name@example.com"
-                                className="w-full px-4 py-3 bg-white border border-neutral-300 rounded-sm focus:outline-none focus:border-black text-black placeholder-neutral-400 font-normal transition-all text-sm"
+                                className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-lg focus:outline-none focus:border-green-700 text-neutral-900 placeholder-neutral-400 font-normal transition-all text-sm"
                             />
                         </div>
 
                         <div>
-                            <label className="block text-xs font-semibold text-black uppercase tracking-wider mb-1.5">
+                            <label className="block text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-1.5">
                                 Password
                             </label>
                             <div className="relative">
@@ -118,12 +113,12 @@ const Signup = () => {
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     placeholder="At least 8 characters"
-                                    className="w-full px-4 py-3 pr-11 bg-white border border-neutral-300 rounded-sm focus:outline-none focus:border-black text-black placeholder-neutral-400 font-normal transition-all text-sm"
+                                    className="w-full px-4 py-3 pr-11 bg-neutral-50 border border-neutral-200 rounded-lg focus:outline-none focus:border-green-700 text-neutral-900 placeholder-neutral-400 font-normal transition-all text-sm"
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-black transition-colors p-1 cursor-pointer"
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-700 transition-colors p-1 cursor-pointer"
                                     title={showPassword ? "Hide password" : "Show password"}
                                 >
                                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -134,7 +129,7 @@ const Signup = () => {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full py-3 px-4 bg-[#FF6206] hover:bg-[#FF6206]/90 text-white font-medium rounded-sm transition-all flex items-center justify-center gap-2 text-sm disabled:opacity-70 disabled:cursor-not-allowed mt-2 cursor-pointer shadow-sm"
+                            className="w-full py-3.5 px-4 bg-green-700 hover:bg-green-800 text-white font-semibold rounded-lg transition-all flex items-center justify-center gap-2 text-sm disabled:opacity-70 disabled:cursor-not-allowed mt-2 cursor-pointer"
                         >
                             {loading ? (
                                 <div className="w-4 h-4 border-2 border-white border-t-transparent animate-spin rounded-full" />
@@ -159,7 +154,7 @@ const Signup = () => {
                     <button
                         type="button"
                         onClick={loginWithGoogle}
-                        className="w-full py-3 px-4 bg-white hover:bg-neutral-50 text-black font-medium border border-neutral-300 rounded-sm transition-all flex items-center justify-center gap-3 text-sm cursor-pointer shadow-sm"
+                        className="w-full py-3 px-4 bg-white hover:bg-neutral-50 text-neutral-700 font-medium border border-neutral-200 rounded-lg transition-all flex items-center justify-center gap-3 text-sm cursor-pointer"
                     >
                         <svg className="w-5 h-5" viewBox="0 0 24 24">
                             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -171,13 +166,12 @@ const Signup = () => {
                     </button>
                 </div>
 
-                {/* Legal footer text per Section 4 */}
                 <div className="bg-neutral-50 px-8 py-4 border-t border-neutral-200 text-center">
                     <p className="text-[11px] text-neutral-500 font-light leading-relaxed">
                         By creating an account, you agree to NanoLink's{' '}
-                        <a href="#terms" onClick={(e) => { e.preventDefault(); alert('Terms of Service'); }} className="text-[#FF6206] underline font-medium hover:text-black">Terms of Service</a>,{' '}
-                        <a href="#privacy" onClick={(e) => { e.preventDefault(); alert('Privacy Policy'); }} className="text-[#FF6206] underline font-medium hover:text-black">Privacy Policy</a> and{' '}
-                        <a href="#aup" onClick={(e) => { e.preventDefault(); alert('Acceptable Use Policy'); }} className="text-[#FF6206] underline font-medium hover:text-black">Acceptable Use Policy</a>.
+                        <a href="#terms" onClick={(e) => { e.preventDefault(); alert('Terms of Service'); }} className="text-green-700 hover:underline font-medium">Terms of Service</a>,{' '}
+                        <a href="#privacy" onClick={(e) => { e.preventDefault(); alert('Privacy Policy'); }} className="text-green-700 hover:underline font-medium">Privacy Policy</a> and{' '}
+                        <a href="#aup" onClick={(e) => { e.preventDefault(); alert('Acceptable Use Policy'); }} className="text-green-700 hover:underline font-medium">Acceptable Use Policy</a>.
                     </p>
                 </div>
             </div>

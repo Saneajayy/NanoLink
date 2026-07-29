@@ -1,65 +1,107 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #1A00FF;
-  --color-accent: #FF6206;
-  --color-white: #FFFFFF;
+  --color-primary: #166534;
+  --color-accent: #15803d;
+  --color-dark: #FFFFFF;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-heading: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 @layer base {
-  * {
-    border-radius: 0 !important;
-  }
-
-  /* User requested all grey borders across cards, tabs, inputs, and panels to be pure black */
-  [class*="border-neutral-"],
-  [class*="border-gray-"] {
-    border-color: #000000 !important;
-  }
-
   body {
+    font-family: var(--font-sans);
     background-color: #FFFFFF;
-    color: #000000;
+    color: #111827;
     font-weight: 300;
     margin: 0;
     padding: 0;
     overflow-x: hidden;
   }
+
+  h1, h2, h3, h4, h5, h6, th, legend {
+    font-family: var(--font-heading);
+  }
 }
 
-/* Custom premium styling without rounded corners */
+.font-heading {
+  font-family: var(--font-heading);
+}
+
+.font-sans {
+  font-family: var(--font-sans);
+}
+
+/* Clean Minimalist styling with zero shadows or glows */
 .glass-panel {
   background: #FFFFFF;
-  border: 1px solid #000000;
+  border: 1px solid #E5E7EB;
+  border-radius: 0.75rem;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
 }
 
-.glass-panel-light {
+.glass-card {
   background: #FFFFFF;
-  border: 1px solid #000000;
+  border: 1px solid #E5E7EB;
+  border-radius: 0.75rem;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
 }
 
 .hover-lift {
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
 .hover-lift:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border-color: #166534;
+  background-color: #F9FAFB;
 }
 
-/* Scrollbar styling - clean minimalist */
+/* Scrollbar styling - clean minimalist light */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #FFFFFF;
-  border-left: 1px solid #F3F4F6;
+  background: #F9FAFB;
+  border-left: 1px solid #E5E7EB;
 }
 ::-webkit-scrollbar-thumb {
   background: #D1D5DB;
-  border-radius: 0 !important;
+  border-radius: 9999px !important;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #9CA3AF;
+}
+
+/* Animations - clean subtle movement only */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-4px); }
+}
+
+@keyframes slide-ticker {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+.ticker-wrap {
+  display: flex;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.ticker-move {
+  display: flex;
+  animation: slide-ticker 35s linear infinite;
+}
+
+.ticker-move:hover {
+  animation-play-state: paused;
 }

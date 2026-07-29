@@ -23,44 +23,43 @@ const DeleteQrConfirmModal = ({ isOpen, onClose, qrCode, onSuccess }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-150 overflow-y-auto">
-      <div className="relative w-full max-w-md bg-white border border-neutral-200 overflow-hidden my-8 shadow-xl rounded-md">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-150 overflow-y-auto">
+      <div className="relative w-full max-w-md bg-white border border-neutral-200 overflow-hidden my-8 shadow-2xl rounded-xl text-neutral-900 animate-in zoom-in duration-200">
         <div className="p-6 border-b border-neutral-200 flex items-center justify-between bg-white">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-red-50 text-red-600 border border-red-200 flex items-center justify-center rounded-full shrink-0">
+            <div className="w-10 h-10 bg-red-100 text-red-700 border border-red-200 flex items-center justify-center rounded-lg shrink-0">
               <Trash2 className="w-5 h-5" />
             </div>
-            <h2 className="text-lg font-bold text-black">Delete QR Code?</h2>
+            <h2 className="text-lg font-bold text-neutral-900">Delete QR Code?</h2>
           </div>
-          <button onClick={onClose} className="p-2 text-neutral-400 hover:text-black hover:bg-neutral-100 rounded-sm transition-colors cursor-pointer">
+          <button onClick={onClose} className="p-2 text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 rounded-lg transition-colors cursor-pointer">
             <X className="w-5 h-5" />
           </button>
         </div>
 
         <div className="p-6 space-y-5 bg-white font-light">
           {error && (
-            <div className="p-3 bg-red-50 border border-red-200 text-red-600 font-medium text-xs rounded-sm">
+            <div className="p-3 bg-red-50 border border-red-200 text-red-700 font-medium text-xs rounded-lg">
               {error}
             </div>
           )}
 
-          <div className="flex items-start gap-3 p-4 bg-neutral-50 border border-neutral-200 rounded-sm">
-            <AlertTriangle className="w-5 h-5 text-[#FF6206] shrink-0 mt-0.5" />
-            <div className="text-sm text-black font-normal leading-relaxed">
-              Are you sure you want to delete the QR code for <span className="font-semibold text-black">"{qrCode.linkId?.title || qrCode.linkId?.slug || qrCode.title || qrCode.destinationUrl || 'this link'}"</span>?
+          <div className="flex items-start gap-3 p-4 bg-neutral-50 border border-neutral-200 rounded-lg">
+            <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+            <div className="text-sm text-neutral-700 font-normal leading-relaxed">
+              Are you sure you want to delete the QR code for <span className="font-bold text-neutral-900">"{qrCode.linkId?.title || qrCode.linkId?.slug || qrCode.title || qrCode.destinationUrl || 'this link'}"</span>?
             </div>
           </div>
 
-          {/* Educational notice per Section 6.7 */}
-          <div className="flex items-start gap-2.5 p-3.5 bg-neutral-50 border border-neutral-200 rounded-sm text-xs text-neutral-600 font-light">
-            <Info className="w-4 h-4 text-[#FF6206] shrink-0 mt-0.5" />
+          <div className="flex items-start gap-2.5 p-4 bg-neutral-50 border border-neutral-200 rounded-lg text-xs text-neutral-600 font-light">
+            <Info className="w-4 h-4 text-green-700 shrink-0 mt-0.5" />
             {qrCode.linkId ? (
               <span>
-                This will <span className="font-medium text-black underline">not</span> delete the underlying short link (<code className="font-mono font-medium text-black">{qrCode.linkId?.shortUrl}</code>), only the QR code styling and scan tracking.
+                This will <span className="font-bold text-neutral-900 underline">not</span> delete the underlying short link (<code className="font-mono font-bold text-green-700">{qrCode.linkId?.shortUrl}</code>), only the QR code styling and scan tracking.
               </span>
             ) : (
               <span>
-                This will permanently delete this static direct QR code (<code className="font-mono font-medium text-black">{qrCode.destinationUrl}</code>).
+                This will permanently delete this static direct QR code (<code className="font-mono font-bold text-green-700">{qrCode.destinationUrl}</code>).
               </span>
             )}
           </div>
@@ -70,7 +69,7 @@ const DeleteQrConfirmModal = ({ isOpen, onClose, qrCode, onSuccess }) => {
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="px-5 py-2.5 bg-[#1A00FF] hover:bg-[#1A00FF]/90 text-white font-medium rounded-sm text-xs transition-colors cursor-pointer shadow-sm"
+              className="px-5 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 font-semibold rounded-lg text-xs transition-colors cursor-pointer border border-neutral-200"
             >
               Cancel
             </button>
@@ -78,7 +77,7 @@ const DeleteQrConfirmModal = ({ isOpen, onClose, qrCode, onSuccess }) => {
               type="button"
               onClick={handleDelete}
               disabled={loading}
-              className="px-6 py-2.5 bg-[#FF6206] hover:bg-[#FF6206]/90 text-white font-medium rounded-sm transition-all text-xs flex items-center gap-2 disabled:opacity-70 cursor-pointer shadow-sm"
+              className="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition-all text-xs flex items-center gap-2 disabled:opacity-70 cursor-pointer"
             >
               {loading ? (
                 <div className="w-4 h-4 border-2 border-white border-t-transparent animate-spin rounded-full" />

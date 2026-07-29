@@ -4,7 +4,7 @@ import QRCodeStyling from 'qr-code-styling';
 export const StyledQRCode = ({
   value = 'https://nanolink.app',
   size = 180,
-  fgColor = '#000000',
+  fgColor = '#166534',
   bgColor = '#FFFFFF',
   level = 'H',
   includeMargin = true,
@@ -47,18 +47,18 @@ export const StyledQRCode = ({
           errorCorrectionLevel: level || 'H'
         },
         dotsOptions: {
-          color: fgColor || '#000000',
+          color: fgColor || '#166534',
           type: dotsType
         },
         backgroundOptions: {
           color: bgColor || '#FFFFFF'
         },
         cornersSquareOptions: {
-          color: fgColor || '#000000',
+          color: fgColor || '#166534',
           type: cornersSquareType
         },
         cornersDotOptions: {
-          color: fgColor || '#000000',
+          color: fgColor || '#166534',
           type: cornersDotType
         },
         type: 'svg'
@@ -110,9 +110,9 @@ export const StyledQRCode = ({
 
   if (frame === 'scan-me') {
     return (
-      <div key="frame-scan-me" className="inline-flex flex-col items-center justify-center bg-white border-2 border-black p-3 relative shrink-0 w-fit h-fit mx-auto">
+      <div key="frame-scan-me" className="inline-flex flex-col items-center justify-center bg-white border-2 border-green-700 p-3 relative shrink-0 w-fit h-fit mx-auto">
         {qrElement}
-        <div key="banner-scan-me" className="bg-[#FF6206] text-white text-[11px] font-black uppercase tracking-wider py-1.5 px-3 w-full text-center mt-3 shrink-0">
+        <div key="banner-scan-me" className="bg-green-700 text-white text-[11px] font-bold uppercase tracking-wider py-1.5 px-3 w-full text-center mt-3 shrink-0">
           SCAN ME
         </div>
       </div>
@@ -121,7 +121,7 @@ export const StyledQRCode = ({
 
   if (frame === 'border') {
     return (
-      <div key="frame-border" className="inline-flex items-center justify-center p-3 bg-white border-4 border-black shrink-0 w-fit h-fit mx-auto">
+      <div key="frame-border" className="inline-flex items-center justify-center p-3 bg-white border-2 border-green-700 shrink-0 w-fit h-fit mx-auto">
         {qrElement}
       </div>
     );
